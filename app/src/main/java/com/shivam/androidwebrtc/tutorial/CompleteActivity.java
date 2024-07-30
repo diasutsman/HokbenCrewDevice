@@ -263,9 +263,9 @@ public class CompleteActivity extends AppCompatActivity {
 
     private void initializeSurfaceViews() {
         rootEglBase = EglBase.create();
-        binding.surfaceView.init(rootEglBase.getEglBaseContext(), null);
-        binding.surfaceView.setEnableHardwareScaler(true);
-        binding.surfaceView.setMirror(true);
+//        binding.surfaceView.init(rootEglBase.getEglBaseContext(), null);
+//        binding.surfaceView.setEnableHardwareScaler(true);
+//        binding.surfaceView.setMirror(true);
 
         binding.surfaceView2.init(rootEglBase.getEglBaseContext(), null);
         binding.surfaceView2.setEnableHardwareScaler(true);
@@ -288,7 +288,7 @@ public class CompleteActivity extends AppCompatActivity {
 
         videoTrackFromCamera = factory.createVideoTrack(VIDEO_TRACK_ID, videoSource);
         videoTrackFromCamera.setEnabled(true);
-        videoTrackFromCamera.addRenderer(new VideoRenderer(binding.surfaceView));
+//        videoTrackFromCamera.addRenderer(new VideoRenderer(binding.surfaceView));
 
         //create an AudioSource instance
         audioSource = factory.createAudioSource(audioConstraints);
