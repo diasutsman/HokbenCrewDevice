@@ -8,7 +8,6 @@ import androidx.databinding.DataBindingUtil;
 import android.content.Context;
 import android.content.Intent;
 import android.media.projection.MediaProjectionManager;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,10 +15,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
 
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.shivam.androidwebrtc.repository.MainRepository;
+import com.shivam.androidwebrtc.service.WebrtcService;
+import com.shivam.androidwebrtc.service.WebrtcServiceRepository;
 import com.myhexaville.androidwebrtc.BuildConfig;
 import com.myhexaville.androidwebrtc.R;
 import com.myhexaville.androidwebrtc.databinding.ActivitySamplePeerConnectionBinding;
+import com.shivam.androidwebrtc.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,7 +57,7 @@ import static io.socket.client.Socket.EVENT_DISCONNECT;
 import static org.webrtc.SessionDescription.Type.ANSWER;
 import static org.webrtc.SessionDescription.Type.OFFER;
 
-public class CompleteActivity extends AppCompatActivity {
+public class CompleteActivity extends AppCompatActivity implements MainRepository.Listener {
     private static final String TAG = "CompleteActivity";
     private static final int RC_CALL = 111;
     public static final String VIDEO_TRACK_ID = "ARDAMSv0";
@@ -70,6 +72,7 @@ public class CompleteActivity extends AppCompatActivity {
     private boolean isChannelReady;
     private boolean isStarted;
 
+    private WebrtcServiceRepository webrtcServiceRepository;
 
     MediaConstraints audioConstraints;
     MediaConstraints videoConstraints;
@@ -86,16 +89,23 @@ public class CompleteActivity extends AppCompatActivity {
     private PeerConnectionFactory factory;
     private VideoTrack videoTrackFromCamera;
 
-    //Firestore
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sample_peer_connection);
         setSupportActionBar(binding.toolbar);
 
-        start();
+        startVideoCapture();
+//        initShareScreen();
+    }
+
+    private void initShareScreen() {
+        webrtcServiceRepository = new WebrtcServiceRepository(getApplicationContext());
+        WebrtcService.Companion.setSurfaceView(binding.surfaceViewShareScreen);
+        WebrtcService.Companion.setListener(this);
+        webrtcServiceRepository.startIntent();
+        startScreenCapture();
+
     }
 
     @Override
@@ -114,7 +124,7 @@ public class CompleteActivity extends AppCompatActivity {
     }
 
     @AfterPermissionGranted(RC_CALL)
-    private void start() {
+    private void startVideoCapture() {
         String[] perms = {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
         if (EasyPermissions.hasPermissions(this, perms)) {
             connectToSignallingServer();
@@ -309,31 +319,25 @@ public class CompleteActivity extends AppCompatActivity {
         sendMessage("got user media");
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode != capturePermissionRequestCode) {
-
-        }
-
-
-    }
-
     private void startScreenCapture() {
-        if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
-            return;
-        }
-        MediaProjectionManager mediaProjectionManager = null;
-
-        mediaProjectionManager = (MediaProjectionManager) getApplication().getSystemService(
-                Context.MEDIA_PROJECTION_SERVICE
-        );
+        if (!(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)) return;
+        MediaProjectionManager mediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
 
         startActivityForResult(
                 mediaProjectionManager.createScreenCaptureIntent(), capturePermissionRequestCode
         );
-
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != capturePermissionRequestCode) {
+            return;
+        }
+        WebrtcService.Companion.setScreenPermissionIntent(data);
+        webrtcServiceRepository.requestConnection(Utils.getUsername(getContentResolver(), true));
+    }
+
 
     private PeerConnection createPeerConnection(PeerConnectionFactory factory) {
         ArrayList<PeerConnection.IceServer> iceServers = new ArrayList<>();
@@ -457,4 +461,32 @@ public class CompleteActivity extends AppCompatActivity {
         return Camera2Enumerator.isSupported(this);
     }
 
+    @Override
+    public void onRemoteStreamAdded(MediaStream stream) {
+        runOnUiThread(() -> {
+            stream.videoTracks.get(0).addRenderer(
+                    new VideoRenderer(binding.surfaceViewShareScreen
+                    ));
+        });
+    }
+
+    @Override
+    public void onCallEndReceived() {
+
+    }
+
+    @Override
+    public void onConnectionConnected() {
+
+    }
+
+    @Override
+    public void onConnectionRequestReceived() {
+        webrtcServiceRepository.acceptCAll();
+    }
+
+    @Override
+    public void onConnectionRequestReceived(String target) {
+
+    }
 }
