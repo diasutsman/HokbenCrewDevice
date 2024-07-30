@@ -1,8 +1,7 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'kotlin-android'
+apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'kotlin-kapt'
-//apply plugin: 'com.google.dagger.hilt.android'
+apply plugin: 'com.google.dagger.hilt.android'
 
 buildscript {
     repositories {
@@ -85,14 +84,12 @@ dependencies {
     implementation files('libs/autobanh.jar')
     implementation files('libs/base_java.jar')
     implementation files('libs/libjingle_peerconnection.jar')
-    implementation 'com.google.firebase:firebase-firestore:21.4.3'
     implementation 'com.android.support:multidex:1.0.3'
-
-    implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 
     implementation 'com.google.code.gson:gson:2.10.1'
 //    implementation 'com.mesibo.api:webrtc:1.0.5'
-    implementation "com.google.dagger:hilt-android:2.44"
-//    kapt "com.google.dagger:hilt-compiler:2.44"
+    implementation "com.google.dagger:hilt-android:2.51.1"
+    kapt "com.google.dagger:hilt-compiler:2.51.1"
+    annotationProcessor("com.google.dagger:hilt-android:2.51.1")
     implementation 'org.java-websocket:Java-WebSocket:1.5.3'
 }
