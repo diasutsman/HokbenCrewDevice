@@ -14,10 +14,9 @@ import org.java_websocket.handshake.ServerHandshake
 import java.net.URI
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.Exception
 
 @Singleton
-class SocketClient(
+class SocketClient @Inject constructor(
     private val gson: Gson
 ) {
     private var username: String? = null

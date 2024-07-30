@@ -9,16 +9,16 @@ import android.os.IBinder
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import com.shivam.androidwebrtc.repository.MainRepository
-import com.shivam.androidwebrtc.socket.SocketClient
-import com.shivam.androidwebrtc.webrtc.WebrtcClient
-import com.google.gson.Gson
 import com.myhexaville.androidwebrtc.R
+import com.shivam.androidwebrtc.repository.MainRepository
 import com.shivam.androidwebrtc.utils.Utils
+import dagger.hilt.android.AndroidEntryPoint
 import org.webrtc.MediaStream
 import org.webrtc.SurfaceViewRenderer
+import javax.inject.Inject
 
-class WebrtcService : Service(), MainRepository.Listener {
+@AndroidEntryPoint
+class WebrtcService @Inject constructor() : Service(), MainRepository.Listener {
 
 
     companion object {
@@ -27,9 +27,7 @@ class WebrtcService : Service(), MainRepository.Listener {
         var listener: MainRepository.Listener? = null
     }
 
-    private var _mainRepository: MainRepository? = null
-    private val mainRepository get() = _mainRepository as MainRepository
-
+    @Inject lateinit var mainRepository: MainRepository
 
     private lateinit var notificationManager: NotificationManager
     private lateinit var username: String
@@ -40,8 +38,6 @@ class WebrtcService : Service(), MainRepository.Listener {
         notificationManager = getSystemService(
             NotificationManager::class.java
         )
-        _mainRepository =
-            MainRepository(SocketClient(Gson()), WebrtcClient(applicationContext, Gson()), Gson())
         mainRepository.listener = this
         this.username = Utils.getUsername(contentResolver)
     }

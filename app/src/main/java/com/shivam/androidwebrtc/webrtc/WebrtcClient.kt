@@ -8,14 +8,27 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.view.WindowManager
 import androidx.annotation.RequiresApi
+import com.google.gson.Gson
 import com.shivam.androidwebrtc.utils.DataModel
 import com.shivam.androidwebrtc.utils.DataModelType
-import com.google.gson.Gson
-import org.webrtc.*
+import org.webrtc.EglBase
+import org.webrtc.IceCandidate
+import org.webrtc.MediaConstraints
+import org.webrtc.MediaStream
+import org.webrtc.PeerConnection
 import org.webrtc.PeerConnection.Observer
 import org.webrtc.PeerConnection.RTCConfiguration
+import org.webrtc.PeerConnectionFactory
+import org.webrtc.ScreenCapturerAndroid
+import org.webrtc.SessionDescription
+import org.webrtc.SurfaceTextureHelper
+import org.webrtc.SurfaceViewRenderer
+import org.webrtc.VideoCapturer
+import org.webrtc.VideoRenderer
+import org.webrtc.VideoTrack
+import javax.inject.Inject
 
-class WebrtcClient(
+class WebrtcClient @Inject constructor(
     private val context: Context, private val gson: Gson
 ) {
 

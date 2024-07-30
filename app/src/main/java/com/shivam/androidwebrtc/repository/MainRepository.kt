@@ -9,9 +9,10 @@ import com.shivam.androidwebrtc.webrtc.MyPeerObserver
 import com.shivam.androidwebrtc.webrtc.WebrtcClient
 import com.google.gson.Gson
 import org.webrtc.*
+import javax.inject.Inject
 
 
-class MainRepository(
+class MainRepository @Inject constructor(
     private val socketClient: SocketClient,
     private val webrtcClient: WebrtcClient,
     private val gson: Gson

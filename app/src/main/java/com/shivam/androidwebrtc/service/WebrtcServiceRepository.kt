@@ -4,9 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
-import com.shivam.androidwebrtc.service.WebrtcService
+import javax.inject.Inject
 
-class WebrtcServiceRepository(
+class WebrtcServiceRepository  @Inject constructor(
     private val context: Context
 ) {
 

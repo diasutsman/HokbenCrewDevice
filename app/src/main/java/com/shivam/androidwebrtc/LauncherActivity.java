@@ -9,6 +9,9 @@ import android.view.View;
 import com.myhexaville.androidwebrtc.R;
 import com.shivam.androidwebrtc.tutorial.CompleteActivity;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class LauncherActivity extends AppCompatActivity {
 
     @Override
