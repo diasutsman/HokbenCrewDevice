@@ -96,16 +96,18 @@ public class CompleteActivity extends AppCompatActivity implements MainRepositor
         setSupportActionBar(binding.toolbar);
 
         startVideoCapture();
-//        initShareScreen();
+        initShareScreen();
     }
 
     private void initShareScreen() {
+        Log.e("NotError", "CompleteActivity@initShareScreen");
+
         webrtcServiceRepository = new WebrtcServiceRepository(getApplicationContext());
         WebrtcService.Companion.setSurfaceView(binding.surfaceViewShareScreen);
         WebrtcService.Companion.setListener(this);
         webrtcServiceRepository.startIntent();
-        startScreenCapture();
 
+        startScreenCapture();
     }
 
     @Override
@@ -320,6 +322,7 @@ public class CompleteActivity extends AppCompatActivity implements MainRepositor
     }
 
     private void startScreenCapture() {
+        Log.e("NotError", "CompleteActivity@startScreenCapture");
         if (!(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)) return;
         MediaProjectionManager mediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
 
@@ -331,9 +334,11 @@ public class CompleteActivity extends AppCompatActivity implements MainRepositor
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.e("NotError", "CompleteActivity@onActivityResult");
         if (requestCode != capturePermissionRequestCode) {
             return;
         }
+
         WebrtcService.Companion.setScreenPermissionIntent(data);
         webrtcServiceRepository.requestConnection(Utils.getUsername(getContentResolver(), true));
     }
@@ -486,7 +491,7 @@ public class CompleteActivity extends AppCompatActivity implements MainRepositor
     }
 
     @Override
-    public void onConnectionRequestReceived(String target) {
-
+    public void onConnectionRequestReceived(@NonNull String target) {
+        webrtcServiceRepository.acceptCAll();
     }
 }

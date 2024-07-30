@@ -36,10 +36,12 @@ class MainRepository(
     }
 
     fun setPermissionIntentToWebrtcClient(intent:Intent){
+        Log.e("NotError", "MainRepository@setPermissionIntentToWebrtcClient")
         webrtcClient.setPermissionIntent(intent)
     }
 
     fun sendScreenShareConnection(target: String){
+        Log.e("NotError", this.javaClass.kotlin.simpleName + "@sendScreenShareConnection")
         socketClient.sendMessageToSocket(
             DataModel(
                 type = StartStreaming,
@@ -51,6 +53,7 @@ class MainRepository(
     }
 
     fun startScreenCapturing(surfaceView: SurfaceViewRenderer){
+        Log.e("NotError", "MainRepository@startScreenCapturing")
         webrtcClient.startScreenCapturing(surfaceView)
     }
 
@@ -104,6 +107,7 @@ class MainRepository(
     }
 
     override fun onNewMessageReceived(model: DataModel) {
+        Log.e("NotError", "MainRepository@onNewMessageReceived model: $model")
         when (model.type) {
             StartStreaming -> {
                 this.target = model.username

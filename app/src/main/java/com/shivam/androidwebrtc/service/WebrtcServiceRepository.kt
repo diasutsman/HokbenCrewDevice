@@ -3,8 +3,8 @@ package com.shivam.androidwebrtc.service
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import com.shivam.androidwebrtc.service.WebrtcService
-import javax.inject.Inject
 
 class WebrtcServiceRepository(
     private val context: Context
@@ -25,6 +25,7 @@ class WebrtcServiceRepository(
     }
 
     fun requestConnection(target: String) {
+        Log.e("NotError", "WebrtcServiceRepository@requestConnection")
         val thread = Thread {
             val startIntent = Intent(context, WebrtcService::class.java)
             startIntent.action = "RequestConnectionIntent"

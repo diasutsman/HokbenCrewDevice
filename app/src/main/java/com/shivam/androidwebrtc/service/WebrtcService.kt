@@ -6,6 +6,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.shivam.androidwebrtc.repository.MainRepository
@@ -71,6 +72,7 @@ class WebrtcService : Service(), MainRepository.Listener {
                 }
 
                 "RequestConnectionIntent" -> {
+                    Log.e("NotError", "WebrtcService@onStartCommand intent: RequestConnectionIntent")
                     val target = intent.getStringExtra("target")
                     target?.let {
                         mainRepository.setPermissionIntentToWebrtcClient(screenPermissionIntent!!)
@@ -105,7 +107,7 @@ class WebrtcService : Service(), MainRepository.Listener {
     }
 
     override fun onConnectionRequestReceived(target: String) {
-
+        listener?.onConnectionRequestReceived(target)
     }
 
     override fun onConnectionRequestReceived() {

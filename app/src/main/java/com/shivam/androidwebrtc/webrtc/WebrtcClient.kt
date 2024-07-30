@@ -14,7 +14,6 @@ import com.google.gson.Gson
 import org.webrtc.*
 import org.webrtc.PeerConnection.Observer
 import org.webrtc.PeerConnection.RTCConfiguration
-import javax.inject.Inject
 
 class WebrtcClient(
     private val context: Context, private val gson: Gson
@@ -65,6 +64,7 @@ class WebrtcClient(
     }
 
     fun setPermissionIntent(intent: Intent) {
+        Log.e("NotError", "WebrtcClient@setPermissionIntent")
         this.permissionIntent = intent
     }
 
@@ -79,6 +79,7 @@ class WebrtcClient(
     }
 
     fun startScreenCapturing(view: SurfaceViewRenderer) {
+        Log.e("NotError", this.javaClass.kotlin.simpleName + "@startScreenCapturing")
         val displayMetrics = DisplayMetrics()
         val windowsManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         windowsManager.defaultDisplay.getMetrics(displayMetrics)
@@ -96,11 +97,17 @@ class WebrtcClient(
             context,
             object : VideoCapturer.CapturerObserver {
                 override fun onCapturerStarted(success: Boolean) {
-                    Log.d("WebrtcClient", "WebrtcClient@startScreenCapturing VideoCapturer.CapturerObserver@onCapturerStarted: Try to run it")
+                    Log.d(
+                        "WebrtcClient",
+                        "WebrtcClient@startScreenCapturing VideoCapturer.CapturerObserver@onCapturerStarted: Try to run it"
+                    )
                 }
 
                 override fun onCapturerStopped() {
-                    Log.d("WebrtcClient", "WebrtcClient@startScreenCapturing VideoCapturer.CapturerObserver@onCapturerStopped: Try to run it")
+                    Log.d(
+                        "WebrtcClient",
+                        "WebrtcClient@startScreenCapturing VideoCapturer.CapturerObserver@onCapturerStopped: Try to run it"
+                    )
                 }
 
                 override fun onByteBufferFrameCaptured(
@@ -110,7 +117,10 @@ class WebrtcClient(
                     p3: Int,
                     p4: Long
                 ) {
-                    Log.d("WebrtcClient", "WebrtcClient@startScreenCapturing VideoCapturer.CapturerObserver@onByteBufferFrameCaptured: Try to run it")
+                    Log.d(
+                        "WebrtcClient",
+                        "WebrtcClient@startScreenCapturing VideoCapturer.CapturerObserver@onByteBufferFrameCaptured: Try to run it"
+                    )
                 }
 
                 override fun onTextureFrameCaptured(
@@ -121,7 +131,10 @@ class WebrtcClient(
                     p4: Int,
                     p5: Long
                 ) {
-                    Log.d("WebrtcClient", "WebrtcClient@startScreenCapturing VideoCapturer.CapturerObserver@onByteBufferFrameCaptured: Try to run it")
+                    Log.d(
+                        "WebrtcClient",
+                        "WebrtcClient@startScreenCapturing VideoCapturer.CapturerObserver@onByteBufferFrameCaptured: Try to run it"
+                    )
                 }
 
             }
@@ -168,8 +181,8 @@ class WebrtcClient(
 //            disableNetworkMonitor = false
 //        }).createPeerConnectionFactory()
         return PeerConnectionFactory(PeerConnectionFactory.Options().apply {
-            disableEncryption = false
-            disableNetworkMonitor = false
+            disableEncryption = true
+            disableNetworkMonitor = true
         })
     }
 

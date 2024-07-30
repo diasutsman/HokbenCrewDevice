@@ -70,6 +70,7 @@ class SocketClient(
 
 
     fun sendMessageToSocket(message: Any?) {
+        Log.e("NotError", this.javaClass.kotlin.simpleName + "@sendMessageToSocket message: $message")
         try {
             webSocket?.send(gson.toJson(message))
         } catch (e: Exception) {
