@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.myhexaville.androidwebrtc.BuildConfig;
 import com.myhexaville.androidwebrtc.R;
 import com.myhexaville.androidwebrtc.databinding.ActivitySamplePeerConnectionBinding;
 
@@ -136,7 +137,7 @@ public class CompleteActivity extends AppCompatActivity {
         try {
             // For me this was "http://192.168.1.220:3000";
             // $ hostname -I
-            String URL = "http://192.168.0.3:3030/";// "https://calm-badlands-59575.herokuapp.com/"; //
+            String URL = BuildConfig.SIGNALING_SERVER_URL;// "https://calm-badlands-59575.herokuapp.com/"; //
             Log.e(TAG, "REPLACE ME: IO Socket:" + URL);
             socket = IO.socket(URL);
 

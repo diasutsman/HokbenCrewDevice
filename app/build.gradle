@@ -8,14 +8,14 @@ buildscript {
 }
 
 android {
-//    defaultConfig {
-//        // Get the properties from local.properties
-//        Properties properties = new Properties()
-//        properties.load(project.rootProject.file("local.properties").newDataInputStream())
-//
-//        // Set API keys in BuildConfig
-//        buildConfigField "String", "SIGNALING_SERVER_URL", "\"${properties.getProperty("SIGNALING_SERVER_URL")}\""
-//    }
+    defaultConfig {
+        // Get the properties from local.properties
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file("local.properties").newDataInputStream())
+
+        // Set API keys in BuildConfig
+        buildConfigField "String", "SIGNALING_SERVER_URL", "\"${properties.getProperty("signaling_server_url")}\""
+    }
     sourceSets.main {
         jniLibs.srcDir 'libs'
         jni.srcDirs = [] //disable automatic ndk-build call
