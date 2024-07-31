@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
         surfaceView = binding.surfaceViewShareScreen
         listener = this
         webrtcServiceRepository.startIntent(Utils.getUsername(contentResolver))
-        startScreenCapture()
+//        startScreenCapture()
     }
 
     override fun onRequestPermissionsResult(
