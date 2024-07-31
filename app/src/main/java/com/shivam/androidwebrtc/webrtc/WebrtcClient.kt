@@ -11,20 +11,20 @@ import androidx.annotation.RequiresApi
 import com.google.gson.Gson
 import com.shivam.androidwebrtc.utils.DataModel
 import com.shivam.androidwebrtc.utils.DataModelType
+import org.webrtc.DefaultVideoDecoderFactory
+import org.webrtc.DefaultVideoEncoderFactory
 import org.webrtc.EglBase
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
 import org.webrtc.MediaStream
 import org.webrtc.PeerConnection
 import org.webrtc.PeerConnection.Observer
-import org.webrtc.PeerConnection.RTCConfiguration
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.ScreenCapturerAndroid
 import org.webrtc.SessionDescription
 import org.webrtc.SurfaceTextureHelper
 import org.webrtc.SurfaceViewRenderer
 import org.webrtc.VideoCapturer
-import org.webrtc.VideoRenderer
 import org.webrtc.VideoTrack
 import javax.inject.Inject
 
@@ -51,11 +51,7 @@ class WebrtcClient @Inject constructor(
     )
 
     private var screenCapturer: VideoCapturer? = null
-    private val localVideoSource by lazy {
-        peerConnectionFactory.createVideoSource(
-            createScreenCapturer()
-        )
-    }
+    private val localVideoSource by lazy { peerConnectionFactory.createVideoSource(false) }
     private val localTrackId = "local_track"
     private val localStreamId = "local_stream"
     private var localVideoTrack: VideoTrack? = null
@@ -77,13 +73,11 @@ class WebrtcClient @Inject constructor(
     }
 
     fun setPermissionIntent(intent: Intent) {
-        Log.e("NotError", "WebrtcClient@setPermissionIntent")
         this.permissionIntent = intent
     }
 
     private fun initSurfaceView(view: SurfaceViewRenderer) {
         this.localSurfaceView = view
-        Log.d("WebrtcClient", "WebrtcClient@initSurfaceView: Try to run it")
         view.run {
             setMirror(false)
             setEnableHardwareScaler(true)
@@ -92,7 +86,7 @@ class WebrtcClient @Inject constructor(
     }
 
     fun startScreenCapturing(view: SurfaceViewRenderer) {
-        Log.e("NotError", this.javaClass.kotlin.simpleName + "@startScreenCapturing")
+        Log.e("NotError", "startScreenCapturing: SurfaceViewRenderer id: ${view.id}")
         val displayMetrics = DisplayMetrics()
         val windowsManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         windowsManager.defaultDisplay.getMetrics(displayMetrics)
@@ -105,111 +99,57 @@ class WebrtcClient @Inject constructor(
         )
 
         screenCapturer = createScreenCapturer()
-        screenCapturer?.initialize(
+        screenCapturer!!.initialize(
             surfaceTextureHelper,
             context,
-            object : VideoCapturer.CapturerObserver {
-                override fun onCapturerStarted(success: Boolean) {
-                    Log.d(
-                        "WebrtcClient",
-                        "WebrtcClient@startScreenCapturing VideoCapturer.CapturerObserver@onCapturerStarted: Try to run it"
-                    )
-                }
-
-                override fun onCapturerStopped() {
-                    Log.d(
-                        "WebrtcClient",
-                        "WebrtcClient@startScreenCapturing VideoCapturer.CapturerObserver@onCapturerStopped: Try to run it"
-                    )
-                }
-
-                override fun onByteBufferFrameCaptured(
-                    p0: ByteArray?,
-                    p1: Int,
-                    p2: Int,
-                    p3: Int,
-                    p4: Long
-                ) {
-                    Log.d(
-                        "WebrtcClient",
-                        "WebrtcClient@startScreenCapturing VideoCapturer.CapturerObserver@onByteBufferFrameCaptured: Try to run it"
-                    )
-                }
-
-                override fun onTextureFrameCaptured(
-                    p0: Int,
-                    p1: Int,
-                    p2: Int,
-                    p3: FloatArray?,
-                    p4: Int,
-                    p5: Long
-                ) {
-                    Log.d(
-                        "WebrtcClient",
-                        "WebrtcClient@startScreenCapturing VideoCapturer.CapturerObserver@onByteBufferFrameCaptured: Try to run it"
-                    )
-                }
-
-            }
+            localVideoSource.capturerObserver
         )
-        screenCapturer?.startCapture(screenWidthPixels, screenHeightPixels, 15)
+        screenCapturer!!.startCapture(screenWidthPixels, screenHeightPixels, 15)
 
         localVideoTrack =
             peerConnectionFactory.createVideoTrack(localTrackId + "_video", localVideoSource)
-        localVideoTrack?.addRenderer(VideoRenderer(view))
+//        localVideoTrack?.addSink(view) # this should not be added since, the phone should not add the screen share of it self
         localStream = peerConnectionFactory.createLocalMediaStream(localStreamId)
         localStream?.addTrack(localVideoTrack)
         peerConnection?.addStream(localStream)
-        Log.d("WebrtcClient", "WebrtcClient@startScreenCapturing: Try to run it")
+
     }
 
     private fun createScreenCapturer(): VideoCapturer {
-        return ScreenCapturerAndroid(permissionIntent, @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-        object : MediaProjection.Callback() {
-            override fun onStop() {
-                super.onStop()
-                Log.d("TAG", "onStop: stopped screen casting permission")
-            }
-        })
+        return ScreenCapturerAndroid(permissionIntent,
+            @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+            object : MediaProjection.Callback() {
+                override fun onStop() {
+                    super.onStop()
+                    Log.d("TAG", "onStop: stopped screen casting permission")
+                }
+            })
     }
 
     private fun initPeerConnectionFactory(application: Context) {
-        PeerConnectionFactory.initializeAndroidGlobals(this, true, true, true)
-//        val options = PeerConnectionFactory.Options.builder(application)
-//            .setEnableInternalTracer(true).setFieldTrials("WebRTC-H264HighProfile/Enabled/")
-//            .createInitializationOptions()
-//        val options = PeerConnectionFactory
-
+        val options = PeerConnectionFactory.InitializationOptions.builder(application)
+            .setEnableInternalTracer(true).setFieldTrials("WebRTC-H264HighProfile/Enabled/")
+            .createInitializationOptions()
+        PeerConnectionFactory.initialize(options)
     }
 
     private fun createPeerConnectionFactory(): PeerConnectionFactory {
-//        return PeerConnectionFactory.builder().setVideoDecoderFactory(
-//            DefaultVideoDecoderFactory(eglBaseContext)
-//        ).setVideoEncoderFactory(
-//            DefaultVideoEncoderFactory(
-//                eglBaseContext, true, true
-//            )
-//        ).setOptions(PeerConnectionFactory.Options().apply {
-//            disableEncryption = false
-//            disableNetworkMonitor = false
-//        }).createPeerConnectionFactory()
-        return PeerConnectionFactory(PeerConnectionFactory.Options().apply {
-            disableEncryption = true
-            disableNetworkMonitor = true
-        })
+        return PeerConnectionFactory.builder().setVideoDecoderFactory(
+            DefaultVideoDecoderFactory(eglBaseContext)
+        ).setVideoEncoderFactory(
+            DefaultVideoEncoderFactory(
+                eglBaseContext, true, true
+            )
+        ).setOptions(PeerConnectionFactory.Options().apply {
+            disableEncryption = false
+            disableNetworkMonitor = false
+        }).createPeerConnectionFactory()
     }
 
     private fun createPeerConnection(observer: Observer): PeerConnection? {
-//        return peerConnectionFactory.createPeerConnection(
-//            iceServer, observer
-//        )
-        val rtcConfig = RTCConfiguration(iceServer)
-        val pcConstraints = MediaConstraints()
         return peerConnectionFactory.createPeerConnection(
-            rtcConfig, pcConstraints, observer
+            iceServer, observer
         )
-
-
     }
 
     fun call(target: String) {
@@ -252,11 +192,14 @@ class WebrtcClient @Inject constructor(
     }
 
     fun onRemoteSessionReceived(sessionDescription: SessionDescription) {
+
         peerConnection?.setRemoteDescription(MySdpObserver(), sessionDescription)
     }
 
     fun addIceCandidate(iceCandidate: IceCandidate) {
+
         peerConnection?.addIceCandidate(iceCandidate)
+
     }
 
     fun sendIceCandidate(candidate: IceCandidate, target: String) {
@@ -285,7 +228,7 @@ class WebrtcClient @Inject constructor(
     fun restart() {
         closeConnection()
         localSurfaceView.let {
-//            it.clearImage()
+            it.clearImage()
             it.release()
             initializeWebrtcClient(username, it, observer)
         }

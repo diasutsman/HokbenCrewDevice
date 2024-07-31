@@ -1,6 +1,7 @@
 package com.shivam.androidwebrtc.tutorial
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import android.os.Build
@@ -23,29 +24,29 @@ import io.socket.client.Socket
 import io.socket.emitter.Emitter
 import org.json.JSONException
 import org.json.JSONObject
-import org.webrtc.AudioSource
-import org.webrtc.AudioTrack
-import org.webrtc.Camera1Enumerator
-import org.webrtc.Camera2Enumerator
-import org.webrtc.CameraEnumerator
-import org.webrtc.DataChannel
-import org.webrtc.EglBase
-import org.webrtc.IceCandidate
-import org.webrtc.MediaConstraints
-import org.webrtc.MediaStream
-import org.webrtc.PeerConnection
-import org.webrtc.PeerConnection.IceConnectionState
-import org.webrtc.PeerConnection.IceGatheringState
-import org.webrtc.PeerConnection.IceServer
-import org.webrtc.PeerConnection.RTCConfiguration
-import org.webrtc.PeerConnection.SignalingState
-import org.webrtc.PeerConnectionFactory
-import org.webrtc.SessionDescription
-import org.webrtc.SurfaceTextureHelper
-import org.webrtc.VideoCapturer
-import org.webrtc.VideoRenderer
-import org.webrtc.VideoSource
-import org.webrtc.VideoTrack
+import org.webrtc2.AudioSource
+import org.webrtc2.AudioTrack
+import org.webrtc2.Camera1Enumerator
+import org.webrtc2.Camera2Enumerator
+import org.webrtc2.CameraEnumerator
+import org.webrtc2.DataChannel
+import org.webrtc2.EglBase
+import org.webrtc2.IceCandidate
+import org.webrtc2.MediaConstraints
+import org.webrtc2.MediaStream
+import org.webrtc2.PeerConnection
+import org.webrtc2.PeerConnection.IceConnectionState
+import org.webrtc2.PeerConnection.IceGatheringState
+import org.webrtc2.PeerConnection.IceServer
+import org.webrtc2.PeerConnection.RTCConfiguration
+import org.webrtc2.PeerConnection.SignalingState
+import org.webrtc2.PeerConnectionFactory
+import org.webrtc2.SessionDescription
+import org.webrtc2.SurfaceTextureHelper
+import org.webrtc2.VideoCapturer
+import org.webrtc2.VideoRenderer
+import org.webrtc2.VideoSource
+import org.webrtc2.VideoTrack
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 import java.net.URISyntaxException
@@ -58,9 +59,8 @@ class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
     private var isChannelReady = false
     private var isStarted = false
 
-    @JvmField
     @Inject
-    var webrtcServiceRepository: WebrtcServiceRepository? = null
+    lateinit var webrtcServiceRepository: WebrtcServiceRepository
 
     var audioConstraints: MediaConstraints? = null
     var videoConstraints: MediaConstraints? = null
@@ -82,17 +82,17 @@ class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sample_peer_connection)
         setSupportActionBar(binding.toolbar)
 
-        startVideoCapture()
-//        initShareScreen()
+//        startVideoCapture()
+        initShareScreen()
     }
 
+    @SuppressLint("NewApi")
     private fun initShareScreen() {
         Log.e("NotError", "CompleteActivity@initShareScreen")
 
         surfaceView = binding.surfaceViewShareScreen
         listener = this
-        webrtcServiceRepository!!.startIntent()
-
+        webrtcServiceRepository.startIntent(Utils.getUsername(contentResolver))
         startScreenCapture()
     }
 
@@ -469,12 +469,10 @@ class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
         return Camera2Enumerator.isSupported(this)
     }
 
-    override fun onRemoteStreamAdded(stream: MediaStream) {
+    override fun onRemoteStreamAdded(stream: org.webrtc.MediaStream) {
         runOnUiThread {
-            stream.videoTracks[0].addRenderer(
-                VideoRenderer(
-                    binding!!.surfaceViewShareScreen
-                )
+            stream.videoTracks[0].addSink(
+                binding.surfaceViewShareScreen
             )
         }
     }
@@ -485,12 +483,8 @@ class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
     override fun onConnectionConnected() {
     }
 
-    override fun onConnectionRequestReceived() {
-        webrtcServiceRepository!!.acceptCAll()
-    }
-
     override fun onConnectionRequestReceived(target: String) {
-        webrtcServiceRepository!!.acceptCAll()
+        webrtcServiceRepository!!.acceptCAll(target)
     }
 
     companion object {

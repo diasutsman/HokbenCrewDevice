@@ -2,13 +2,21 @@ package com.shivam.androidwebrtc.repository
 
 import android.content.Intent
 import android.util.Log
+import com.google.gson.Gson
 import com.shivam.androidwebrtc.socket.SocketClient
 import com.shivam.androidwebrtc.utils.DataModel
-import com.shivam.androidwebrtc.utils.DataModelType.*
+import com.shivam.androidwebrtc.utils.DataModelType.Answer
+import com.shivam.androidwebrtc.utils.DataModelType.EndCall
+import com.shivam.androidwebrtc.utils.DataModelType.IceCandidates
+import com.shivam.androidwebrtc.utils.DataModelType.Offer
+import com.shivam.androidwebrtc.utils.DataModelType.StartStreaming
 import com.shivam.androidwebrtc.webrtc.MyPeerObserver
 import com.shivam.androidwebrtc.webrtc.WebrtcClient
-import com.google.gson.Gson
-import org.webrtc.*
+import org.webrtc.IceCandidate
+import org.webrtc.MediaStream
+import org.webrtc.PeerConnection
+import org.webrtc.SessionDescription
+import org.webrtc.SurfaceViewRenderer
 import javax.inject.Inject
 
 
@@ -36,13 +44,11 @@ class MainRepository @Inject constructor(
         socketClient.init(username)
     }
 
-    fun setPermissionIntentToWebrtcClient(intent:Intent){
-        Log.e("NotError", "MainRepository@setPermissionIntentToWebrtcClient")
+    fun setPermissionIntentToWebrtcClient(intent: Intent) {
         webrtcClient.setPermissionIntent(intent)
     }
 
-    fun sendScreenShareConnection(target: String){
-        Log.e("NotError", this.javaClass.kotlin.simpleName + "@sendScreenShareConnection")
+    fun sendScreenShareConnection(target: String) {
         socketClient.sendMessageToSocket(
             DataModel(
                 type = StartStreaming,
@@ -53,16 +59,15 @@ class MainRepository @Inject constructor(
         )
     }
 
-    fun startScreenCapturing(surfaceView: SurfaceViewRenderer){
-        Log.e("NotError", "MainRepository@startScreenCapturing")
+    fun startScreenCapturing(surfaceView: SurfaceViewRenderer) {
         webrtcClient.startScreenCapturing(surfaceView)
     }
 
-    fun startCall(target: String){
+    fun startCall(target: String) {
         webrtcClient.call(target)
     }
 
-    fun sendCallEndedToOtherPeer(){
+    fun sendCallEndedToOtherPeer() {
         socketClient.sendMessageToSocket(
             DataModel(
                 type = EndCall,
@@ -73,11 +78,11 @@ class MainRepository @Inject constructor(
         )
     }
 
-    fun restartRepository(){
+    fun restartRepository() {
         webrtcClient.restart()
     }
 
-    fun onDestroy(){
+    fun onDestroy() {
         socketClient.onDestroy()
         webrtcClient.closeConnection()
     }
@@ -87,14 +92,15 @@ class MainRepository @Inject constructor(
         webrtcClient.initializeWebrtcClient(username, surfaceView,
             object : MyPeerObserver() {
                 override fun onIceCandidate(p0: IceCandidate?) {
+                    Log.e("NotError", "MainRepository@initWebrtcClient@onIceCandidate: $p0")
                     super.onIceCandidate(p0)
                     p0?.let { webrtcClient.sendIceCandidate(it, target) }
                 }
 
-                override fun onIceConnectionChange(p0: PeerConnection.IceConnectionState?) {
-                    super.onIceConnectionChange(p0)
-                    Log.d("TAG", "onConnectionChange: $p0")
-                    if (p0 == PeerConnection.IceConnectionState.CONNECTED){
+                override fun onConnectionChange(newState: PeerConnection.PeerConnectionState?) {
+                    super.onConnectionChange(newState)
+                    Log.d("TAG", "onConnectionChange: $newState")
+                    if (newState == PeerConnection.PeerConnectionState.CONNECTED) {
                         listener?.onConnectionConnected()
                     }
                 }
@@ -108,17 +114,18 @@ class MainRepository @Inject constructor(
     }
 
     override fun onNewMessageReceived(model: DataModel) {
-        Log.e("NotError", "MainRepository@onNewMessageReceived model: $model")
         when (model.type) {
             StartStreaming -> {
                 this.target = model.username
                 //notify ui, conneciton request is being made, so show it
                 listener?.onConnectionRequestReceived(model.username)
             }
+
             EndCall -> {
                 //notify ui call is ended
                 listener?.onCallEndReceived()
             }
+
             Offer -> {
                 webrtcClient.onRemoteSessionReceived(
                     SessionDescription(
@@ -129,12 +136,17 @@ class MainRepository @Inject constructor(
                 this.target = model.username
                 webrtcClient.answer(target)
             }
+
             Answer -> {
                 webrtcClient.onRemoteSessionReceived(
-                    SessionDescription(SessionDescription.Type.ANSWER, model.data.toString())
+                    SessionDescription(
+                        SessionDescription.Type.ANSWER,
+                        model.data.toString()
+                    )
                 )
 
             }
+
             IceCandidates -> {
                 val candidate = try {
                     gson.fromJson(model.data.toString(), IceCandidate::class.java)
@@ -146,6 +158,7 @@ class MainRepository @Inject constructor(
                     webrtcClient.addIceCandidate(it)
                 }
             }
+
             else -> Unit
         }
     }
@@ -159,6 +172,5 @@ class MainRepository @Inject constructor(
         fun onConnectionConnected()
         fun onCallEndReceived()
         fun onRemoteStreamAdded(stream: MediaStream)
-        fun onConnectionRequestReceived()
     }
 }

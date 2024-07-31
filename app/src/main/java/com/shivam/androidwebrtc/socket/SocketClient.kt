@@ -17,19 +17,18 @@ import javax.inject.Singleton
 
 @Singleton
 class SocketClient @Inject constructor(
-    private val gson: Gson
-) {
-    private var username: String? = null
-
+    private val gson:Gson
+){
+    private var username:String?=null
     companion object {
-        private var webSocket: WebSocketClient? = null
+        private var webSocket:WebSocketClient?=null
     }
 
-    var listener: Listener? = null
-    fun init(username: String) {
+    var listener:Listener?=null
+    fun init(username:String){
         this.username = username
 
-        webSocket = object : WebSocketClient(URI(BuildConfig.WS_URL)) {
+        webSocket= object : WebSocketClient(URI(BuildConfig.WS_URL)){
             override fun onOpen(handshakedata: ServerHandshake?) {
                 sendMessageToSocket(
                     DataModel(
@@ -43,8 +42,8 @@ class SocketClient @Inject constructor(
 
             override fun onMessage(message: String?) {
                 val model = try {
-                    gson.fromJson(message.toString(), DataModel::class.java)
-                } catch (e: Exception) {
+                    gson.fromJson(message.toString(),DataModel::class.java)
+                }catch (e:Exception){
                     null
                 }
                 Log.d("TAG", "onMessage: $model")
@@ -68,20 +67,19 @@ class SocketClient @Inject constructor(
     }
 
 
-    fun sendMessageToSocket(message: Any?) {
-        Log.e("NotError", this.javaClass.kotlin.simpleName + "@sendMessageToSocket message: $message")
+    fun sendMessageToSocket(message:Any?){
         try {
             webSocket?.send(gson.toJson(message))
-        } catch (e: Exception) {
+        }catch (e:Exception){
             e.printStackTrace()
         }
     }
 
-    fun onDestroy() {
+    fun onDestroy(){
         webSocket?.close()
     }
 
     interface Listener {
-        fun onNewMessageReceived(model: DataModel)
+        fun onNewMessageReceived(model:DataModel)
     }
 }

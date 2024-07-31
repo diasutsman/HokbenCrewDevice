@@ -3,7 +3,7 @@ package com.shivam.androidwebrtc.webrtc
 import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription
 
-open class MySdpObserver : SdpObserver{
+open class MySdpObserver : SdpObserver {
     override fun onCreateSuccess(desc: SessionDescription?) {
     }
 

@@ -1,81 +1,79 @@
 package com.shivam.androidwebrtc.service
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
+import androidx.annotation.RequiresApi
 import javax.inject.Inject
 
-class WebrtcServiceRepository  @Inject constructor(
-    private val context: Context
+class WebrtcServiceRepository @Inject constructor(
+    private val context: Context,
 ) {
 
-    fun startIntent() {
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun startIntent(username: String) {
         val thread = Thread {
             val startIntent = Intent(context, WebrtcService::class.java)
             startIntent.action = "StartIntent"
+            startIntent.putExtra("username", username)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(startIntent)
-            } else {
-                context.startService(startIntent)
-            }
+
+            context.startForegroundService(startIntent)
+
         }
         thread.start()
     }
 
+
+    @SuppressLint("NewApi")
     fun requestConnection(target: String) {
-        Log.e("NotError", "WebrtcServiceRepository@requestConnection")
         val thread = Thread {
             val startIntent = Intent(context, WebrtcService::class.java)
             startIntent.action = "RequestConnectionIntent"
             startIntent.putExtra("target", target)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(startIntent)
-            } else {
-                context.startService(startIntent)
-            }
+
+            context.startForegroundService(startIntent)
+
         }
         thread.start()
     }
 
-    fun acceptCAll() {
+    @SuppressLint("NewApi")
+    fun acceptCAll(target: String) {
         val thread = Thread {
             val startIntent = Intent(context, WebrtcService::class.java)
             startIntent.action = "AcceptCallIntent"
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(startIntent)
-            } else {
-                context.startService(startIntent)
-            }
+            startIntent.putExtra("target", target)
+
+            context.startForegroundService(startIntent)
+
         }
         thread.start()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun endCallIntent() {
         val thread = Thread {
             val startIntent = Intent(context, WebrtcService::class.java)
             startIntent.action = "EndCallIntent"
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(startIntent)
-            } else {
-                context.startService(startIntent)
-            }
+
+            context.startForegroundService(startIntent)
+
         }
         thread.start()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun stopIntent() {
         val thread = Thread {
 
             val startIntent = Intent(context, WebrtcService::class.java)
             startIntent.action = "StopIntent"
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(startIntent)
-            } else {
-                context.startService(startIntent)
-            }
+
+            context.startForegroundService(startIntent)
+
         }
         thread.start()
     }

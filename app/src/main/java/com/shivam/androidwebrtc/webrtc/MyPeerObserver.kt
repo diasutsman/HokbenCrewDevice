@@ -1,6 +1,10 @@
 package com.shivam.androidwebrtc.webrtc
 
-import org.webrtc.*
+import org.webrtc.DataChannel
+import org.webrtc.IceCandidate
+import org.webrtc.MediaStream
+import org.webrtc.PeerConnection
+import org.webrtc.RtpReceiver
 
 open class MyPeerObserver : PeerConnection.Observer{
     override fun onSignalingChange(p0: PeerConnection.SignalingState?) {
@@ -32,5 +36,8 @@ open class MyPeerObserver : PeerConnection.Observer{
     }
 
     override fun onRenegotiationNeeded() {
+    }
+
+    override fun onAddTrack(p0: RtpReceiver?, p1: Array<out MediaStream>?) {
     }
 }
