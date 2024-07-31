@@ -1,4 +1,4 @@
-package id.hokben.crewdevice.tutorial
+package id.hokben.crewdevice
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -9,8 +9,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import id.hokben.crewdevice.BuildConfig
-import id.hokben.crewdevice.R
+import dagger.hilt.android.AndroidEntryPoint
 import id.hokben.crewdevice.databinding.ActivitySamplePeerConnectionBinding
 import id.hokben.crewdevice.repository.MainRepository
 import id.hokben.crewdevice.service.WebrtcService.Companion.listener
@@ -18,7 +17,7 @@ import id.hokben.crewdevice.service.WebrtcService.Companion.screenPermissionInte
 import id.hokben.crewdevice.service.WebrtcService.Companion.surfaceView
 import id.hokben.crewdevice.service.WebrtcServiceRepository
 import id.hokben.crewdevice.utils.Utils
-import dagger.hilt.android.AndroidEntryPoint
+import id.hokben.crewdevice.webrtc.SimpleSdpObserver
 import io.socket.client.IO
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
@@ -51,7 +50,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
+class MainActivity : AppCompatActivity(), MainRepository.Listener {
     private var socket: Socket? = null
     private var isInitiator = false
     private var isChannelReady = false
@@ -89,7 +88,7 @@ class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
 
     @SuppressLint("NewApi")
     private fun initShareScreen() {
-        Log.e("NotError", "CompleteActivity@initShareScreen")
+        Log.e("NotError", "MainActivity@initShareScreen")
 
         surfaceView = binding.surfaceViewShareScreen
         listener = this
@@ -338,12 +337,12 @@ class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
         mediaStream.addTrack(videoTrackFromCamera)
         mediaStream.addTrack(localAudioTrack)
         peerConnection!!.addStream(mediaStream)
-        Log.e("NotError", "CompleteActivity@startStreamingVideo")
+        Log.e("NotError", "MainActivity@startStreamingVideo")
         sendMessage("got user media")
     }
 
     private fun startScreenCapture() {
-        Log.e("NotError", "CompleteActivity@startScreenCapture")
+        Log.e("NotError", "MainActivity@startScreenCapture")
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return
         val mediaProjectionManager =
             getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
@@ -355,7 +354,7 @@ class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.e("NotError", "CompleteActivity@onActivityResult")
+        Log.e("NotError", "MainActivity@onActivityResult")
         if (requestCode != capturePermissionRequestCode) {
             return
         }
@@ -581,7 +580,7 @@ class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
     }
 
     companion object {
-        private const val TAG = "CompleteActivity"
+        private const val TAG = "MainActivity"
         private const val RC_CALL = 111
         const val VIDEO_TRACK_ID: String = "ARDAMSv0"
         const val VIDEO_RESOLUTION_WIDTH: Int = 1280

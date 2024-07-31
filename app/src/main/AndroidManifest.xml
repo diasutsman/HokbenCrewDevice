@@ -25,8 +25,8 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name="id.hokben.crewdevice.LauncherActivity"
-            android:label="@string/title_activity_launch"
+            android:name="id.hokben.crewdevice.MainActivity"
+            android:exported="true"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,10 +34,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="id.hokben.crewdevice.tutorial.CompleteActivity"
-            android:label="@string/title_activity_complete"
-            android:theme="@style/AppTheme.NoActionBar" />
 
         <service android:name="id.hokben.crewdevice.service.WebrtcService" android:foregroundServiceType="mediaProjection" />
     </application>
