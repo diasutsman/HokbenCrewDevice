@@ -1,4 +1,4 @@
-package com.shivam.androidwebrtc.utils
+package id.hokben.crewdevice.utils
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

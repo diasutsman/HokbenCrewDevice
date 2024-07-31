@@ -1,4 +1,4 @@
-package com.shivam.androidwebrtc.service
+package id.hokben.crewdevice.service
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -8,7 +8,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.myhexaville.androidwebrtc.R
-import com.shivam.androidwebrtc.repository.MainRepository
+import id.hokben.crewdevice.repository.MainRepository
 import dagger.hilt.android.AndroidEntryPoint
 import org.webrtc.MediaStream
 import org.webrtc.SurfaceViewRenderer

@@ -1,17 +1,17 @@
-package com.shivam.androidwebrtc.repository
+package id.hokben.crewdevice.repository
 
 import android.content.Intent
 import android.util.Log
 import com.google.gson.Gson
-import com.shivam.androidwebrtc.socket.SocketClient
-import com.shivam.androidwebrtc.utils.DataModel
-import com.shivam.androidwebrtc.utils.DataModelType.Answer
-import com.shivam.androidwebrtc.utils.DataModelType.EndCall
-import com.shivam.androidwebrtc.utils.DataModelType.IceCandidates
-import com.shivam.androidwebrtc.utils.DataModelType.Offer
-import com.shivam.androidwebrtc.utils.DataModelType.StartStreaming
-import com.shivam.androidwebrtc.webrtc.MyPeerObserver
-import com.shivam.androidwebrtc.webrtc.WebrtcClient
+import id.hokben.crewdevice.socket.SocketClient
+import id.hokben.crewdevice.utils.DataModel
+import id.hokben.crewdevice.utils.DataModelType.Answer
+import id.hokben.crewdevice.utils.DataModelType.EndCall
+import id.hokben.crewdevice.utils.DataModelType.IceCandidates
+import id.hokben.crewdevice.utils.DataModelType.Offer
+import id.hokben.crewdevice.utils.DataModelType.StartStreaming
+import id.hokben.crewdevice.webrtc.MyPeerObserver
+import id.hokben.crewdevice.webrtc.WebrtcClient
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
 import org.webrtc.PeerConnection

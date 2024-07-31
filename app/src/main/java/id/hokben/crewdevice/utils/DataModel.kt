@@ -1,4 +1,4 @@
-package com.shivam.androidwebrtc.utils
+package id.hokben.crewdevice.utils
 
 enum class DataModelType{
     SignIn, StartStreaming,EndCall, Offer, Answer, IceCandidates
@@ -6,7 +6,7 @@ enum class DataModelType{
 
 
 data class DataModel(
-    val type:DataModelType?=null,
+    val type: DataModelType?=null,
     val username:String,
     val target:String?=null,
     val data:Any?=null

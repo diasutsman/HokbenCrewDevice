@@ -21,11 +21,11 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:name="com.shivam.androidwebrtc.utils.MyApplication"
+        android:name="id.hokben.crewdevice.utils.MyApplication"
         android:theme="@style/AppTheme">
 
         <activity
-            android:name="com.shivam.androidwebrtc.LauncherActivity"
+            android:name="id.hokben.crewdevice.LauncherActivity"
             android:label="@string/title_activity_launch"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -35,11 +35,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.shivam.androidwebrtc.tutorial.CompleteActivity"
+            android:name="id.hokben.crewdevice.tutorial.CompleteActivity"
             android:label="@string/title_activity_complete"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <service android:name="com.shivam.androidwebrtc.service.WebrtcService" android:foregroundServiceType="mediaProjection" />
+        <service android:name="id.hokben.crewdevice.service.WebrtcService" android:foregroundServiceType="mediaProjection" />
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package com.shivam.androidwebrtc;
+package id.hokben.crewdevice;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,7 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 
 import com.myhexaville.androidwebrtc.R;
-import com.shivam.androidwebrtc.tutorial.CompleteActivity;
+import id.hokben.crewdevice.tutorial.CompleteActivity;
 
 import dagger.hilt.android.AndroidEntryPoint;
 

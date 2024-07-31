@@ -1,4 +1,4 @@
-package com.shivam.androidwebrtc.webrtc
+package id.hokben.crewdevice.webrtc
 
 import android.content.Context
 import android.content.Intent
@@ -9,8 +9,8 @@ import android.util.Log
 import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
-import com.shivam.androidwebrtc.utils.DataModel
-import com.shivam.androidwebrtc.utils.DataModelType
+import id.hokben.crewdevice.utils.DataModel
+import id.hokben.crewdevice.utils.DataModelType
 import org.webrtc.DefaultVideoDecoderFactory
 import org.webrtc.DefaultVideoEncoderFactory
 import org.webrtc.EglBase

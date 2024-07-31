@@ -1,10 +1,10 @@
-package com.shivam.androidwebrtc.socket
+package id.hokben.crewdevice.socket
 
 import android.util.Log
 import com.google.gson.Gson
-import com.myhexaville.androidwebrtc.BuildConfig
-import com.shivam.androidwebrtc.utils.DataModel
-import com.shivam.androidwebrtc.utils.DataModelType
+import id.myhexaville.androidwebrtc.BuildConfig
+import id.hokben.crewdevice.utils.DataModel
+import id.hokben.crewdevice.utils.DataModelType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -24,11 +24,11 @@ class SocketClient @Inject constructor(
         private var webSocket:WebSocketClient?=null
     }
 
-    var listener:Listener?=null
+    var listener: Listener?=null
     fun init(username:String){
         this.username = username
 
-        webSocket= object : WebSocketClient(URI(BuildConfig.WS_URL)){
+        webSocket = object : WebSocketClient(URI(BuildConfig.WS_URL)){
             override fun onOpen(handshakedata: ServerHandshake?) {
                 sendMessageToSocket(
                     DataModel(
@@ -42,7 +42,7 @@ class SocketClient @Inject constructor(
 
             override fun onMessage(message: String?) {
                 val model = try {
-                    gson.fromJson(message.toString(),DataModel::class.java)
+                    gson.fromJson(message.toString(), DataModel::class.java)
                 }catch (e:Exception){
                     null
                 }
@@ -80,6 +80,6 @@ class SocketClient @Inject constructor(
     }
 
     interface Listener {
-        fun onNewMessageReceived(model:DataModel)
+        fun onNewMessageReceived(model: DataModel)
     }
 }

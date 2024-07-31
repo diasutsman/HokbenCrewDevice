@@ -1,4 +1,4 @@
-package com.shivam.androidwebrtc.tutorial
+package id.hokben.crewdevice.tutorial
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -9,15 +9,15 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import com.myhexaville.androidwebrtc.BuildConfig
+import id.myhexaville.androidwebrtc.BuildConfig
 import com.myhexaville.androidwebrtc.R
 import com.myhexaville.androidwebrtc.databinding.ActivitySamplePeerConnectionBinding
-import com.shivam.androidwebrtc.repository.MainRepository
-import com.shivam.androidwebrtc.service.WebrtcService.Companion.listener
-import com.shivam.androidwebrtc.service.WebrtcService.Companion.screenPermissionIntent
-import com.shivam.androidwebrtc.service.WebrtcService.Companion.surfaceView
-import com.shivam.androidwebrtc.service.WebrtcServiceRepository
-import com.shivam.androidwebrtc.utils.Utils
+import id.hokben.crewdevice.repository.MainRepository
+import id.hokben.crewdevice.service.WebrtcService.Companion.listener
+import id.hokben.crewdevice.service.WebrtcService.Companion.screenPermissionIntent
+import id.hokben.crewdevice.service.WebrtcService.Companion.surfaceView
+import id.hokben.crewdevice.service.WebrtcServiceRepository
+import id.hokben.crewdevice.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import io.socket.client.IO
 import io.socket.client.Socket
