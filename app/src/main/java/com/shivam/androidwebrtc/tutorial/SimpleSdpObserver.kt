@@ -1,7 +1,7 @@
 package com.shivam.androidwebrtc.tutorial
 
-import org.webrtc2.SdpObserver
-import org.webrtc2.SessionDescription
+import org.webrtc.SdpObserver
+import org.webrtc.SessionDescription
 
 internal open class SimpleSdpObserver : SdpObserver {
     override fun onCreateSuccess(sessionDescription: SessionDescription) {

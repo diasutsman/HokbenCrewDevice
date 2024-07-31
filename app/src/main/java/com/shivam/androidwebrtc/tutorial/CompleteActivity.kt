@@ -24,33 +24,31 @@ import io.socket.client.Socket
 import io.socket.emitter.Emitter
 import org.json.JSONException
 import org.json.JSONObject
-import org.webrtc2.AudioSource
-import org.webrtc2.AudioTrack
-import org.webrtc2.Camera1Enumerator
-import org.webrtc2.Camera2Enumerator
-import org.webrtc2.CameraEnumerator
-import org.webrtc2.DataChannel
-import org.webrtc2.EglBase
-import org.webrtc2.IceCandidate
-import org.webrtc2.MediaConstraints
-import org.webrtc2.MediaStream
-import org.webrtc2.PeerConnection
-import org.webrtc2.PeerConnection.IceConnectionState
-import org.webrtc2.PeerConnection.IceGatheringState
-import org.webrtc2.PeerConnection.IceServer
-import org.webrtc2.PeerConnection.RTCConfiguration
-import org.webrtc2.PeerConnection.SignalingState
-import org.webrtc2.PeerConnectionFactory
-import org.webrtc2.SessionDescription
-import org.webrtc2.SurfaceTextureHelper
-import org.webrtc2.VideoCapturer
-import org.webrtc2.VideoRenderer
-import org.webrtc2.VideoSource
-import org.webrtc2.VideoTrack
+import org.webrtc.AudioSource
+import org.webrtc.AudioTrack
+import org.webrtc.Camera1Enumerator
+import org.webrtc.Camera2Enumerator
+import org.webrtc.CameraEnumerator
+import org.webrtc.DataChannel
+import org.webrtc.DefaultVideoDecoderFactory
+import org.webrtc.DefaultVideoEncoderFactory
+import org.webrtc.EglBase
+import org.webrtc.IceCandidate
+import org.webrtc.MediaConstraints
+import org.webrtc.MediaStream
+import org.webrtc.PeerConnection
+import org.webrtc.PeerConnectionFactory
+import org.webrtc.RtpReceiver
+import org.webrtc.SessionDescription
+import org.webrtc.SurfaceTextureHelper
+import org.webrtc.VideoCapturer
+import org.webrtc.VideoSource
+import org.webrtc.VideoTrack
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 import java.net.URISyntaxException
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
@@ -58,6 +56,8 @@ class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
     private var isInitiator = false
     private var isChannelReady = false
     private var isStarted = false
+
+    private val localStreamId = "ARDAMS"
 
     @Inject
     lateinit var webrtcServiceRepository: WebrtcServiceRepository
@@ -74,7 +74,7 @@ class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
     private lateinit var binding: ActivitySamplePeerConnectionBinding;
     private var peerConnection: PeerConnection? = null
     private var rootEglBase: EglBase? = null
-    private var factory: PeerConnectionFactory? = null
+    private val peerConnectionFactory: PeerConnectionFactory by lazy { createPeerConnectionFactory() }
     private var videoTrackFromCamera: VideoTrack? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,9 +82,10 @@ class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sample_peer_connection)
         setSupportActionBar(binding.toolbar)
 
-//        startVideoCapture()
+        startVideoCapture()
         initShareScreen()
     }
+
 
     @SuppressLint("NewApi")
     private fun initShareScreen() {
@@ -287,48 +288,57 @@ class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
         //        binding.surfaceView.init(rootEglBase.getEglBaseContext(), null);
 //        binding.surfaceView.setEnableHardwareScaler(true);
 //        binding.surfaceView.setMirror(true);
-        binding!!.surfaceView2.init(rootEglBase?.eglBaseContext, null)
-        binding!!.surfaceView2.setEnableHardwareScaler(true)
-        binding!!.surfaceView2.setMirror(true)
+        binding!!.surfaceShareCamera.init(rootEglBase?.eglBaseContext, null)
+        binding!!.surfaceShareCamera.setEnableHardwareScaler(true)
+        binding!!.surfaceShareCamera.setMirror(true)
 
         //add one more
     }
 
     private fun initializePeerConnectionFactory() {
-        PeerConnectionFactory.initializeAndroidGlobals(this, true, true, true)
-        factory = PeerConnectionFactory(null)
-        factory!!.setVideoHwAccelerationOptions(
-            rootEglBase!!.eglBaseContext,
-            rootEglBase!!.eglBaseContext
-        )
+        val options = PeerConnectionFactory.InitializationOptions.builder(application)
+            .setEnableInternalTracer(true).setFieldTrials("WebRTC-H264HighProfile/Enabled/")
+            .createInitializationOptions()
+        PeerConnectionFactory.initialize(options)
     }
 
     private fun createVideoTrackFromCameraAndShowIt() {
         audioConstraints = MediaConstraints()
         val videoCapturer = createVideoCapturer()
-        val videoSource = factory!!.createVideoSource(videoCapturer)
+        val surfaceTextureHelper = SurfaceTextureHelper.create(
+            Thread.currentThread().name, rootEglBase?.eglBaseContext
+        )
+
+        videoSource = peerConnectionFactory.createVideoSource(false)
+        videoCapturer?.initialize(surfaceTextureHelper, application, videoSource?.capturerObserver)
+
         videoCapturer!!.startCapture(VIDEO_RESOLUTION_WIDTH, VIDEO_RESOLUTION_HEIGHT, FPS)
 
-        videoTrackFromCamera = factory!!.createVideoTrack(VIDEO_TRACK_ID, videoSource)
+        videoTrackFromCamera = peerConnectionFactory!!.createVideoTrack(VIDEO_TRACK_ID, videoSource)
         videoTrackFromCamera?.setEnabled(true)
 
         //        videoTrackFromCamera.addRenderer(new VideoRenderer(binding.surfaceView));
 
         //create an AudioSource instance
-        audioSource = factory!!.createAudioSource(audioConstraints)
-        localAudioTrack = factory!!.createAudioTrack("101", audioSource)
+        audioSource = peerConnectionFactory!!.createAudioSource(audioConstraints)
+        localAudioTrack = peerConnectionFactory!!.createAudioTrack("101", audioSource)
+
+
     }
 
     private fun initializePeerConnections() {
-        peerConnection = createPeerConnection(factory)
+        peerConnection = createPeerConnection()
     }
 
+    /**
+     * The One who send the video stream
+     */
     private fun startStreamingVideo() {
-        val mediaStream = factory!!.createLocalMediaStream("ARDAMS")
+        val mediaStream = peerConnectionFactory!!.createLocalMediaStream(localStreamId)
         mediaStream.addTrack(videoTrackFromCamera)
         mediaStream.addTrack(localAudioTrack)
         peerConnection!!.addStream(mediaStream)
-
+        Log.e("NotError", "CompleteActivity@startStreamingVideo")
         sendMessage("got user media")
     }
 
@@ -358,21 +368,30 @@ class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
         )
     }
 
+    private fun createPeerConnectionFactory(): PeerConnectionFactory {
+        return PeerConnectionFactory.builder().setVideoDecoderFactory(
+            DefaultVideoDecoderFactory(rootEglBase?.eglBaseContext)
+        ).setVideoEncoderFactory(
+            DefaultVideoEncoderFactory(
+                rootEglBase?.eglBaseContext, true, true
+            )
+        ).setOptions(PeerConnectionFactory.Options().apply {
+            disableEncryption = false
+            disableNetworkMonitor = false
+        }).createPeerConnectionFactory()
+    }
 
-    private fun createPeerConnection(factory: PeerConnectionFactory?): PeerConnection {
-        val iceServers = ArrayList<IceServer>()
-        val URL = "stun:stun.l.google.com:19302"
-        iceServers.add(IceServer(URL))
 
-        val rtcConfig = RTCConfiguration(iceServers)
-        val pcConstraints = MediaConstraints()
-
+    private fun createPeerConnection(): PeerConnection? {
+        val iceServers = ArrayList<PeerConnection.IceServer>()
+        val url = "stun:stun.l.google.com:19302"
+        iceServers.add(PeerConnection.IceServer(url))
         val pcObserver: PeerConnection.Observer = object : PeerConnection.Observer {
-            override fun onSignalingChange(signalingState: SignalingState) {
+            override fun onSignalingChange(signalingState: PeerConnection.SignalingState) {
                 Log.d(TAG, "onSignalingChange: ")
             }
 
-            override fun onIceConnectionChange(iceConnectionState: IceConnectionState) {
+            override fun onIceConnectionChange(iceConnectionState: PeerConnection.IceConnectionState) {
                 Log.d(TAG, "onIceConnectionChange: ")
             }
 
@@ -380,7 +399,7 @@ class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
                 Log.d(TAG, "onIceConnectionReceivingChange: ")
             }
 
-            override fun onIceGatheringChange(iceGatheringState: IceGatheringState) {
+            override fun onIceGatheringChange(iceGatheringState: PeerConnection.IceGatheringState) {
                 Log.d(TAG, "onIceGatheringChange: ")
             }
 
@@ -411,7 +430,7 @@ class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
                 val remoteAudioTrack = mediaStream.audioTracks[0]
                 remoteAudioTrack.setEnabled(true)
                 remoteVideoTrack.setEnabled(true)
-                remoteVideoTrack.addRenderer(VideoRenderer(binding!!.surfaceView2))
+                remoteVideoTrack.addSink(binding.surfaceShareCamera)
             }
 
             override fun onRemoveStream(mediaStream: MediaStream) {
@@ -425,9 +444,83 @@ class CompleteActivity : AppCompatActivity(), MainRepository.Listener {
             override fun onRenegotiationNeeded() {
                 Log.d(TAG, "onRenegotiationNeeded: ")
             }
+
+            override fun onAddTrack(p0: RtpReceiver?, p1: Array<out MediaStream>?) {
+
+            }
         }
 
-        return factory!!.createPeerConnection(rtcConfig, pcConstraints, pcObserver)
+        return peerConnectionFactory.createPeerConnection(
+            iceServers, pcObserver
+        )
+//        val iceServers = ArrayList<PeerConnection.IceServer>()
+//        val URL = "stun:stun.l.google.com:19302"
+//        iceServers.add(PeerConnection.IceServer(URL))
+//
+//        val rtcConfig = RTCConfiguration(iceServers)
+//        val pcConstraints = MediaConstraints()
+//
+//        val pcObserver: PeerConnection.Observer = object : PeerConnection.Observer {
+//            override fun onSignalingChange(signalingState: PeerConnection.SignalingState) {
+//                Log.d(TAG, "onSignalingChange: ")
+//            }
+//
+//            override fun onIceConnectionChange(iceConnectionState: IceConnectionState) {
+//                Log.d(TAG, "onIceConnectionChange: ")
+//            }
+//
+//            override fun onIceConnectionReceivingChange(b: Boolean) {
+//                Log.d(TAG, "onIceConnectionReceivingChange: ")
+//            }
+//
+//            override fun onIceGatheringChange(iceGatheringState: IceGatheringState) {
+//                Log.d(TAG, "onIceGatheringChange: ")
+//            }
+//
+//            override fun onIceCandidate(iceCandidate: IceCandidate) {
+//                Log.d(TAG, "onIceCandidate: ")
+//                val message = JSONObject()
+//
+//                try {
+//                    message.put("type", "candidate")
+//                    message.put("label", iceCandidate.sdpMLineIndex)
+//                    message.put("id", iceCandidate.sdpMid)
+//                    message.put("candidate", iceCandidate.sdp)
+//
+//                    Log.d(TAG, "onIceCandidate: sending candidate $message")
+//                    sendMessage(message)
+//                } catch (e: JSONException) {
+//                    e.printStackTrace()
+//                }
+//            }
+//
+//            override fun onIceCandidatesRemoved(iceCandidates: Array<IceCandidate>) {
+//                Log.d(TAG, "onIceCandidatesRemoved: ")
+//            }
+//
+//            override fun onAddStream(mediaStream: MediaStream) {
+//                Log.d(TAG, "onAddStream: " + mediaStream.videoTracks.size)
+//                val remoteVideoTrack = mediaStream.videoTracks[0]
+//                val remoteAudioTrack = mediaStream.audioTracks[0]
+//                remoteAudioTrack.setEnabled(true)
+//                remoteVideoTrack.setEnabled(true)
+//                remoteVideoTrack.addRenderer(VideoRenderer(binding!!.surfaceShareCamera))
+//            }
+//
+//            override fun onRemoveStream(mediaStream: MediaStream) {
+//                Log.d(TAG, "onRemoveStream: ")
+//            }
+//
+//            override fun onDataChannel(dataChannel: DataChannel) {
+//                Log.d(TAG, "onDataChannel: ")
+//            }
+//
+//            override fun onRenegotiationNeeded() {
+//                Log.d(TAG, "onRenegotiationNeeded: ")
+//            }
+//        }
+//
+//        return factory!!.createPeerConnection(rtcConfig, pcConstraints, pcObserver)
     }
 
     private fun createVideoCapturer(): VideoCapturer? {

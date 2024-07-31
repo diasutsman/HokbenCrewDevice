@@ -104,7 +104,7 @@ class WebrtcClient @Inject constructor(
             context,
             localVideoSource.capturerObserver
         )
-        screenCapturer!!.startCapture(screenWidthPixels, screenHeightPixels, 15)
+        screenCapturer!!.startCapture(screenWidthPixels, screenHeightPixels, 30)
 
         localVideoTrack =
             peerConnectionFactory.createVideoTrack(localTrackId + "_video", localVideoSource)
