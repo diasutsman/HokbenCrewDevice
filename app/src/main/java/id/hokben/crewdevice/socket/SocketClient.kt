@@ -2,7 +2,7 @@ package id.hokben.crewdevice.socket
 
 import android.util.Log
 import com.google.gson.Gson
-import id.myhexaville.androidwebrtc.BuildConfig
+import id.hokben.crewdevice.BuildConfig
 import id.hokben.crewdevice.utils.DataModel
 import id.hokben.crewdevice.utils.DataModelType
 import kotlinx.coroutines.CoroutineScope

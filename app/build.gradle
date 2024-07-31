@@ -35,7 +35,7 @@ android {
     }
     defaultConfig {
         vectorDrawables.useSupportLibrary = true
-        applicationId "com.myhexaville.androidwebrtc"
+        applicationId "id.hokben.crewdevice"
         minSdkVersion 19
         targetSdkVersion 27
         versionCode 1
@@ -49,7 +49,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    namespace 'com.myhexaville.androidwebrtc'
+    namespace 'id.hokben.crewdevice'
     kotlinOptions {
         jvmTarget = '17'
     }

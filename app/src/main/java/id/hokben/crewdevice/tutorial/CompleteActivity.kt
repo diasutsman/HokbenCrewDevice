@@ -9,9 +9,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import id.myhexaville.androidwebrtc.BuildConfig
-import com.myhexaville.androidwebrtc.R
-import com.myhexaville.androidwebrtc.databinding.ActivitySamplePeerConnectionBinding
+import id.hokben.crewdevice.BuildConfig
+import id.hokben.crewdevice.R
+import id.hokben.crewdevice.databinding.ActivitySamplePeerConnectionBinding
 import id.hokben.crewdevice.repository.MainRepository
 import id.hokben.crewdevice.service.WebrtcService.Companion.listener
 import id.hokben.crewdevice.service.WebrtcService.Companion.screenPermissionIntent

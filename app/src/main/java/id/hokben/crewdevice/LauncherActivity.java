@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 
-import com.myhexaville.androidwebrtc.R;
+import id.hokben.crewdevice.R;
 import id.hokben.crewdevice.tutorial.CompleteActivity;
 
 import dagger.hilt.android.AndroidEntryPoint;
