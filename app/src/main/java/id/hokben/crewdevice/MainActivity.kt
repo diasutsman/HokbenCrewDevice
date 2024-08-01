@@ -10,7 +10,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
-import id.hokben.crewdevice.databinding.ActivitySamplePeerConnectionBinding
+import id.hokben.crewdevice.databinding.ActivityMainBinding
 import id.hokben.crewdevice.repository.MainRepository
 import id.hokben.crewdevice.service.WebrtcService.Companion.listener
 import id.hokben.crewdevice.service.WebrtcService.Companion.screenPermissionIntent
@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
     var localAudioTrack: AudioTrack? = null
     var surfaceTextureHelper: SurfaceTextureHelper? = null
 
-    private lateinit var binding: ActivitySamplePeerConnectionBinding;
+    private lateinit var binding: ActivityMainBinding
     private var peerConnection: PeerConnection? = null
     private var rootEglBase: EglBase? = null
     private val peerConnectionFactory: PeerConnectionFactory by lazy { createPeerConnectionFactory() }
@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_sample_peer_connection)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         setSupportActionBar(binding.toolbar)
 
         startVideoCapture()
