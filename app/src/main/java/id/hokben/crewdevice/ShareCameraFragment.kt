@@ -1,11 +1,16 @@
 package id.hokben.crewdevice
 
 import android.Manifest
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import id.hokben.crewdevice.databinding.FragmentShareCameraBinding
 import id.hokben.crewdevice.service.WebrtcServiceRepository
@@ -39,6 +44,7 @@ import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 import java.net.URISyntaxException
 import javax.inject.Inject
+
 
 class ShareCameraFragment : Fragment() {
     private var socket: Socket? = null
@@ -96,7 +102,19 @@ class ShareCameraFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        val builder = activity?.let { AlertDialog.Builder(it) }
+        builder
+            ?.setTitle("Nama Device: ${Build.BRAND}")
+            ?.setMessage("Copy kan nama device ini untuk di run ulang, agar bisa menggunakan fitur share screennya")
+            ?.setPositiveButton("Copy") { dialog, _ ->
+                val clipboard: ClipboardManager? =
+                    activity?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+                val clip = ClipData.newPlainText("DeviceName", Build.BRAND)
+                clipboard?.setPrimaryClip(clip)
+                dialog.dismiss()
+            }
+        // Create the AlertDialog object and return it.
+        builder?.create()?.show()
         startVideoCapture()
     }
 

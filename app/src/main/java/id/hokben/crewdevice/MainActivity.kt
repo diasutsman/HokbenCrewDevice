@@ -1,6 +1,8 @@
 package id.hokben.crewdevice
 
+import android.os.Build
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -11,7 +13,7 @@ import id.hokben.crewdevice.databinding.ActivityMainBinding
 
 
 @AndroidEntryPoint
-class MainActivity : FragmentActivity() {
+class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private lateinit var shareCameraFragment: ShareCameraFragment;
@@ -20,6 +22,8 @@ class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding.toolbar.title = "${getString(R.string.app_name)}, Brand Name: ${Build.BRAND}"
+        setSupportActionBar(binding.toolbar);
         initFragments()
         initViewpager()
     }
