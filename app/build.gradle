@@ -17,9 +17,6 @@ android {
 
         // Set API keys in BuildConfig
         buildConfigField "String", "SIGNALING_SERVER_URL", "\"${properties.getProperty("signaling_server_url")}\""
-        buildConfigField "String", "WS_URL", "\"${properties.getProperty("wsl_url")}\""
-        buildConfigField "String", "CREW_DEVICE", "\"${properties.getProperty("crew_device")}\""
-        buildConfigField "String", "CLIENT_DEVICE", "\"${properties.getProperty("client_device")}\""
     }
     sourceSets.main {
         jniLibs.srcDir 'libs'
@@ -51,6 +48,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildFeatures {
+        buildConfig true
+    }
     namespace 'id.hokben.crewdevice'
     kotlinOptions {
         jvmTarget = '17'
@@ -62,6 +62,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 //    implementation 'com.google.firebase:firebase-database:16.0.4'
     implementation 'androidx.core:core-ktx:1.13.1'
+    implementation "com.google.android.material:material:1.1.0-alpha07"
+    implementation 'androidx.viewpager2:viewpager2:1.0.0-alpha05'
     androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -71,8 +73,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
 
     //noinspection GradleCompatible
-    implementation "com.google.android.material:material:1.1.0-alpha07"
-    implementation "androidx.viewpager2:viewpager2:1.0.0-alpha05"
+    implementation 'com.google.android.material:material:1.0.0'
     //noinspection GradleCompatible
     implementation 'androidx.appcompat:appcompat:1.0.0'
     //noinspection GradleCompatible

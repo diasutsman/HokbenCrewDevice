@@ -1,4 +1,4 @@
-package id.hokben.crewdevice.webrtc
+package id.hokben.crewdevice
 
 import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription

@@ -1,111 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+<layout>
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <com.google.android.material.appbar.AppBarLayout
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context="com.myhexaville.androidwebrtc.com.shivam.androidwebrtc.tutorial.MediaStreamActivity">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay">
+            android:background="?attr/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-        </com.google.android.material.appbar.AppBarLayout>
-        <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/pager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            tools:context="com.myhexaville.androidwebrtc.com.shivam.androidwebrtc.tutorial.MediaStreamActivity">
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    </LinearLayout>
 
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
-                android:minHeight="?attr/actionBarSize"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <!--        <LinearLayout-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:orientation="vertical"-->
+    <!--            app:layout_behavior="@string/appbar_scrolling_view_behavior">-->
 
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/pager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+    <!--            &lt;!&ndash;                <FrameLayout&ndash;&gt;-->
+    <!--            &lt;!&ndash;                    android:layout_width="match_parent"&ndash;&gt;-->
+    <!--            &lt;!&ndash;                    android:layout_height="0dp"&ndash;&gt;-->
+    <!--            &lt;!&ndash;                    android:layout_weight="1">&ndash;&gt;-->
 
+    <!--            &lt;!&ndash;                    <org.webrtc.SurfaceViewRenderer&ndash;&gt;-->
+    <!--            &lt;!&ndash;                        android:id="@+id/surface_view"&ndash;&gt;-->
+    <!--            &lt;!&ndash;                        android:layout_width="match_parent"&ndash;&gt;-->
+    <!--            &lt;!&ndash;                        android:layout_height="match_parent" />&ndash;&gt;-->
 
-            <!--        <LinearLayout-->
-            <!--            android:layout_width="match_parent"-->
-            <!--            android:layout_height="wrap_content"-->
-            <!--            android:orientation="vertical"-->
-            <!--            android:visibility="invisible"-->
-            <!--            app:layout_behavior="@string/appbar_scrolling_view_behavior">-->
+    <!--            &lt;!&ndash;                    <TextView&ndash;&gt;-->
+    <!--            &lt;!&ndash;                        android:layout_width="wrap_content"&ndash;&gt;-->
+    <!--            &lt;!&ndash;                        android:layout_height="wrap_content"&ndash;&gt;-->
+    <!--            &lt;!&ndash;                        android:layout_gravity="top|end"&ndash;&gt;-->
+    <!--            &lt;!&ndash;                        android:layout_margin="16dp"&ndash;&gt;-->
+    <!--            &lt;!&ndash;                        android:text="From camera"&ndash;&gt;-->
+    <!--            &lt;!&ndash;                        android:textColor="#fff" />&ndash;&gt;-->
+    <!--            &lt;!&ndash;                </FrameLayout>&ndash;&gt;-->
 
-            <!--            &lt;!&ndash;                <FrameLayout&ndash;&gt;-->
-            <!--            &lt;!&ndash;                    android:layout_width="match_parent"&ndash;&gt;-->
-            <!--            &lt;!&ndash;                    android:layout_height="0dp"&ndash;&gt;-->
-            <!--            &lt;!&ndash;                    android:layout_weight="1">&ndash;&gt;-->
+    <!--            <FrameLayout-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="0dp"-->
+    <!--                android:layout_weight="1">-->
 
-            <!--            &lt;!&ndash;                    <org.webrtc.SurfaceViewRenderer&ndash;&gt;-->
-            <!--            &lt;!&ndash;                        android:id="@+id/surface_view"&ndash;&gt;-->
-            <!--            &lt;!&ndash;                        android:layout_width="match_parent"&ndash;&gt;-->
-            <!--            &lt;!&ndash;                        android:layout_height="match_parent" />&ndash;&gt;-->
+    <!--                <org.webrtc.SurfaceViewRenderer-->
+    <!--                    android:id="@+id/surface_share_camera"-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="match_parent" />-->
 
-            <!--                                <TextView-->
-            <!--                                    android:layout_width="wrap_content"-->
-            <!--                                    android:layout_height="wrap_content"-->
-            <!--                                    android:layout_gravity="top|end"-->
-            <!--                                    android:layout_margin="16dp"-->
-            <!--                                    android:text="From camera"-->
-            <!--                                    android:textColor="#fff" />-->
-            <!--            &lt;!&ndash;                </FrameLayout>&ndash;&gt;-->
+    <!--                <TextView-->
+    <!--                    android:layout_width="wrap_content"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:layout_gravity="top|end"-->
+    <!--                    android:layout_margin="16dp"-->
+    <!--                    android:text="Other Phone"-->
+    <!--                    android:textColor="#fff" />-->
+    <!--            </FrameLayout>-->
 
-            <!--            <FrameLayout-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="0dp"-->
-            <!--                android:layout_weight="1">-->
+    <!--            <FrameLayout-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="0dp"-->
+    <!--                android:layout_weight="1">-->
 
-            <!--                <org.webrtc.SurfaceViewRenderer-->
-            <!--                    android:id="@+id/surface_share_camera"-->
-            <!--                    android:layout_width="match_parent"-->
-            <!--                    android:layout_height="match_parent" />-->
+    <!--                <org.webrtc.SurfaceViewRenderer-->
+    <!--                    android:id="@+id/surfaceView_share_screen"-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="match_parent" />-->
 
-            <!--                <TextView-->
-            <!--                    android:layout_width="wrap_content"-->
-            <!--                    android:layout_height="wrap_content"-->
-            <!--                    android:layout_gravity="top|end"-->
-            <!--                    android:layout_margin="16dp"-->
-            <!--                    android:text="Other Phone"-->
-            <!--                    android:textColor="#fff" />-->
-            <!--            </FrameLayout>-->
+    <!--                <TextView-->
+    <!--                    android:layout_width="wrap_content"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:layout_gravity="top|end"-->
+    <!--                    android:layout_margin="16dp"-->
+    <!--                    android:text="Other Phone Share Screen"-->
+    <!--                    android:textColor="#fff" />-->
+    <!--            </FrameLayout>-->
+    <!--        </LinearLayout>-->
 
-            <!--            <FrameLayout-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="0dp"-->
-            <!--                android:layout_weight="1">-->
-
-            <!--                <org.webrtc.SurfaceViewRenderer-->
-            <!--                    android:id="@+id/surfaceView_share_screen"-->
-            <!--                    android:layout_width="match_parent"-->
-            <!--                    android:layout_height="match_parent" />-->
-
-            <!--                <TextView-->
-            <!--                    android:layout_width="wrap_content"-->
-            <!--                    android:layout_height="wrap_content"-->
-            <!--                    android:layout_gravity="top|end"-->
-            <!--                    android:layout_margin="16dp"-->
-            <!--                    android:text="Other Phone Share Screen"-->
-            <!--                    android:textColor="#fff" />-->
-            <!--            </FrameLayout>-->
-            <!--        </LinearLayout>-->
-
-
-        </LinearLayout>
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </layout>
