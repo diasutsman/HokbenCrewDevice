@@ -9,12 +9,14 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import id.hokben.crewdevice.databinding.ActivityMainBinding
 import id.hokben.crewdevice.repository.MainRepository
-import id.hokben.crewdevice.service.WebrtcService.Companion.listener
 import id.hokben.crewdevice.service.WebrtcService.Companion.screenPermissionIntent
-import id.hokben.crewdevice.service.WebrtcService.Companion.surfaceView
 import id.hokben.crewdevice.service.WebrtcServiceRepository
 import id.hokben.crewdevice.webrtc.SimpleSdpObserver
 import io.socket.client.IO
@@ -36,7 +38,6 @@ import org.webrtc.MediaConstraints
 import org.webrtc.MediaStream
 import org.webrtc.PeerConnection
 import org.webrtc.PeerConnectionFactory
-import org.webrtc.RendererCommon
 import org.webrtc.RtpReceiver
 import org.webrtc.SessionDescription
 import org.webrtc.SurfaceTextureHelper
@@ -76,22 +77,66 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
     private val peerConnectionFactory: PeerConnectionFactory by lazy { createPeerConnectionFactory() }
     private var videoTrackFromCamera: VideoTrack? = null
 
+    private lateinit var shareCameraFragment: ShareCameraFragment
+    private lateinit var shareScreenFragment: ShareScreenFragment
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        setSupportActionBar(binding.toolbar)
 
         startVideoCapture()
-        initShareScreen()
+//        initShareScreen()
+        initFragments()
+        initViewpager()
     }
+
+    private fun initViewpager() {
+        val fragments = listOf(
+            shareCameraFragment,
+            shareScreenFragment
+        ) // Replace with your fragment instances
+        val adapter = ViewPagerAdapter(fragments, this)
+        binding.pager.adapter = adapter
+        binding.pager.offscreenPageLimit = 3 // add this so that the share screen and the camera always shown
+        TabLayoutMediator(binding.tabLayout, binding.pager) { tab, position ->
+            // Set tab text or icon here if needed
+            when (position) {
+                0 -> {
+                    tab.text = "Client Camera"
+                }
+
+                1 -> {
+                    tab.text = "Client Screen"
+                }
+            }
+
+        }.attach()
+    }
+
+    private fun initFragments() {
+        rootEglBase = EglBase.create()
+        shareCameraFragment = ShareCameraFragment(rootEglBase as EglBase)
+        shareScreenFragment = ShareScreenFragment(rootEglBase as EglBase)
+    }
+
+    private inner class ViewPagerAdapter(
+        private val fragments: List<Fragment>,
+        fa: FragmentActivity
+    ) : FragmentStateAdapter(fa) {
+
+        override fun getItemCount(): Int = fragments.size
+
+        override fun createFragment(position: Int): Fragment = fragments[position]
+    }
+
 
 
     @SuppressLint("NewApi")
     private fun initShareScreen() {
         Log.e("NotError", "MainActivity@initShareScreen")
 
-        surfaceView = binding.surfaceViewShareScreen
-        listener = this
+//        surfaceView = binding.surfaceViewShareScreen
+//        listener = this
 //        webrtcServiceRepository.startIntent(Utils.getUsername(contentResolver))
 //        startScreenCapture()
     }
@@ -282,22 +327,12 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
     }
 
     private fun initializeSurfaceViews() {
-        rootEglBase = EglBase.create()
+//        rootEglBase = EglBase.create()
 
         //        binding.surfaceView.init(rootEglBase.getEglBaseContext(), null);
 //        binding.surfaceView.setEnableHardwareScaler(true);
 //        binding.surfaceView.setMirror(true);
-        binding!!.surfaceShareCamera.init(rootEglBase?.eglBaseContext, null)
-        binding!!.surfaceShareCamera.setEnableHardwareScaler(true)
-        binding!!.surfaceShareCamera.setMirror(true)
 
-        binding!!.surfaceShareCamera.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
-
-        binding!!.surfaceViewShareScreen.init(rootEglBase?.eglBaseContext, null)
-        binding!!.surfaceViewShareScreen.setEnableHardwareScaler(true)
-        binding!!.surfaceViewShareScreen.setMirror(false)
-
-        binding!!.surfaceViewShareScreen.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
         //add one more
     }
 
@@ -439,6 +474,7 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
             }
 
             override fun onAddStream(mediaStream: MediaStream) {
+
                 Log.d(TAG, "onAddStream: " + mediaStream.videoTracks.size)
                 Log.d(TAG, "onAddStream: " + mediaStream.videoTracks)
                 val remoteVideoTrack = mediaStream.videoTracks[0]
@@ -446,10 +482,10 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
                 val remoteAudioTrack = mediaStream.audioTracks[0]
                 remoteAudioTrack.setEnabled(true)
                 remoteVideoTrack.setEnabled(true)
-                remoteVideoTrack.addSink(binding.surfaceShareCamera)
+                remoteVideoTrack.addSink(shareCameraFragment.binding.surfaceShareCamera)
 
                 remoteShareScreenVideoTrack.setEnabled(true)
-                remoteShareScreenVideoTrack.addSink(binding.surfaceViewShareScreen)
+                remoteShareScreenVideoTrack.addSink(shareScreenFragment.binding.surfaceViewShareScreen)
             }
 
             override fun onRemoveStream(mediaStream: MediaStream) {
@@ -584,9 +620,9 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
 
     override fun onRemoteStreamAdded(stream: org.webrtc.MediaStream) {
         runOnUiThread {
-            stream.videoTracks[0].addSink(
-                binding.surfaceViewShareScreen
-            )
+//            stream.videoTracks[0].addSink(
+//                binding.surfaceViewShareScreen
+//            )
         }
     }
 
