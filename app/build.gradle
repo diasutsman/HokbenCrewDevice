@@ -17,7 +17,6 @@ android {
 
         // Set API keys in BuildConfig
         buildConfigField "String", "SIGNALING_SERVER_URL", "\"${properties.getProperty("signaling_server_url")}\""
-        buildConfigField "String", "WS_URL", "\"${properties.getProperty("wsl_url")}\""
     }
     sourceSets.main {
         jniLibs.srcDir 'libs'
