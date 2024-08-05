@@ -16,7 +16,6 @@ import id.hokben.crewdevice.service.WebrtcService.Companion.listener
 import id.hokben.crewdevice.service.WebrtcService.Companion.screenPermissionIntent
 import id.hokben.crewdevice.service.WebrtcService.Companion.surfaceView
 import id.hokben.crewdevice.service.WebrtcServiceRepository
-import id.hokben.crewdevice.utils.Utils
 import id.hokben.crewdevice.webrtc.SimpleSdpObserver
 import io.socket.client.IO
 import io.socket.client.Socket
@@ -37,6 +36,7 @@ import org.webrtc.MediaConstraints
 import org.webrtc.MediaStream
 import org.webrtc.PeerConnection
 import org.webrtc.PeerConnectionFactory
+import org.webrtc.RendererCommon
 import org.webrtc.RtpReceiver
 import org.webrtc.SessionDescription
 import org.webrtc.SurfaceTextureHelper
@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
 
         surfaceView = binding.surfaceViewShareScreen
         listener = this
-        webrtcServiceRepository.startIntent(Utils.getUsername(contentResolver))
+//        webrtcServiceRepository.startIntent(Utils.getUsername(contentResolver))
 //        startScreenCapture()
     }
 
@@ -291,6 +291,13 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
         binding!!.surfaceShareCamera.setEnableHardwareScaler(true)
         binding!!.surfaceShareCamera.setMirror(true)
 
+        binding!!.surfaceShareCamera.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
+
+        binding!!.surfaceViewShareScreen.init(rootEglBase?.eglBaseContext, null)
+        binding!!.surfaceViewShareScreen.setEnableHardwareScaler(true)
+        binding!!.surfaceViewShareScreen.setMirror(false)
+
+        binding!!.surfaceViewShareScreen.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
         //add one more
     }
 
@@ -360,11 +367,11 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
         }
 
         screenPermissionIntent = data
-        webrtcServiceRepository!!.requestConnection(
-            Utils.getUsername(
-                contentResolver, true
-            )
-        )
+//        webrtcServiceRepository!!.requestConnection(
+//            Utils.getUsername(
+//                contentResolver, true
+//            )
+//        )
     }
 
     private fun createPeerConnectionFactory(): PeerConnectionFactory {
@@ -382,9 +389,17 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
 
 
     private fun createPeerConnection(): PeerConnection? {
+        Log.i(TAG, "createPeerConnection END")
         val iceServers = ArrayList<PeerConnection.IceServer>()
         val url = "stun:stun.l.google.com:19302"
         iceServers.add(PeerConnection.IceServer(url))
+        iceServers.add(
+            PeerConnection.IceServer(
+                "turn:openrelay.metered.ca:443?transport=tcp",
+                "openrelayproject",
+                "openrelayproject"
+            )
+        )
         val pcObserver: PeerConnection.Observer = object : PeerConnection.Observer {
             override fun onSignalingChange(signalingState: PeerConnection.SignalingState) {
                 Log.d(TAG, "onSignalingChange: ")
@@ -425,11 +440,16 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
 
             override fun onAddStream(mediaStream: MediaStream) {
                 Log.d(TAG, "onAddStream: " + mediaStream.videoTracks.size)
+                Log.d(TAG, "onAddStream: " + mediaStream.videoTracks)
                 val remoteVideoTrack = mediaStream.videoTracks[0]
+                val remoteShareScreenVideoTrack = mediaStream.videoTracks[1]
                 val remoteAudioTrack = mediaStream.audioTracks[0]
                 remoteAudioTrack.setEnabled(true)
                 remoteVideoTrack.setEnabled(true)
                 remoteVideoTrack.addSink(binding.surfaceShareCamera)
+
+                remoteShareScreenVideoTrack.setEnabled(true)
+                remoteShareScreenVideoTrack.addSink(binding.surfaceViewShareScreen)
             }
 
             override fun onRemoveStream(mediaStream: MediaStream) {
@@ -448,6 +468,7 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
 
             }
         }
+        Log.i(TAG, "createPeerConnection END")
 
         return peerConnectionFactory.createPeerConnection(
             iceServers, pcObserver
@@ -576,7 +597,7 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
     }
 
     override fun onConnectionRequestReceived(target: String) {
-        webrtcServiceRepository!!.acceptCAll(target)
+//        webrtcServiceRepository!!.acceptCAll(target)
     }
 
     companion object {

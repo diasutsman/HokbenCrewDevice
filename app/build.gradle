@@ -49,6 +49,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildFeatures {
+        buildConfig true
+    }
     namespace 'id.hokben.crewdevice'
     kotlinOptions {
         jvmTarget = '17'

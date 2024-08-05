@@ -20,6 +20,7 @@ import org.webrtc.MediaStream
 import org.webrtc.PeerConnection
 import org.webrtc.PeerConnection.Observer
 import org.webrtc.PeerConnectionFactory
+import org.webrtc.RendererCommon
 import org.webrtc.ScreenCapturerAndroid
 import org.webrtc.SessionDescription
 import org.webrtc.SurfaceTextureHelper
@@ -82,6 +83,7 @@ class WebrtcClient @Inject constructor(
             setMirror(false)
             setEnableHardwareScaler(true)
             init(eglBaseContext, null)
+            setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
         }
     }
 
