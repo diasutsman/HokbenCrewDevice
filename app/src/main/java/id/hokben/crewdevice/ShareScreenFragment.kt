@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import dagger.hilt.android.AndroidEntryPoint
 import id.hokben.crewdevice.databinding.FragmentShareScreenBinding
 import org.webrtc.EglBase
-import org.webrtc.RendererCommon
 
 
 @AndroidEntryPoint
@@ -33,8 +32,6 @@ class ShareScreenFragment(private val rootEglBase: EglBase) : Fragment() {
         binding.surfaceViewShareScreen.init(rootEglBase.eglBaseContext, null)
         binding.surfaceViewShareScreen.setEnableHardwareScaler(true)
         binding.surfaceViewShareScreen.setMirror(false)
-
-        binding.surfaceViewShareScreen.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
     }
 
 

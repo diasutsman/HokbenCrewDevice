@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import id.hokben.crewdevice.databinding.FragmentShareCameraBinding
 import org.webrtc.EglBase
-import org.webrtc.RendererCommon
 
 
 class ShareCameraFragment(private val rootEglBase: EglBase) : Fragment() {
@@ -27,8 +26,6 @@ class ShareCameraFragment(private val rootEglBase: EglBase) : Fragment() {
         binding.surfaceShareCamera.init(rootEglBase.eglBaseContext, null)
         binding.surfaceShareCamera.setEnableHardwareScaler(true)
         binding.surfaceShareCamera.setMirror(true)
-
-        binding.surfaceShareCamera.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
 
     }
 

@@ -426,15 +426,6 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
     private fun createPeerConnection(): PeerConnection? {
         Log.i(TAG, "createPeerConnection END")
         val iceServers = ArrayList<PeerConnection.IceServer>()
-        val url = "stun:stun.l.google.com:19302"
-        iceServers.add(PeerConnection.IceServer(url))
-        iceServers.add(
-            PeerConnection.IceServer(
-                "turn:openrelay.metered.ca:443?transport=tcp",
-                "openrelayproject",
-                "openrelayproject"
-            )
-        )
         val pcObserver: PeerConnection.Observer = object : PeerConnection.Observer {
             override fun onSignalingChange(signalingState: PeerConnection.SignalingState) {
                 Log.d(TAG, "onSignalingChange: ")
