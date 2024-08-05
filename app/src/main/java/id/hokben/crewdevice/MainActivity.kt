@@ -1,10 +1,6 @@
 package id.hokben.crewdevice
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.content.Intent
-import android.media.projection.MediaProjectionManager
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -13,15 +9,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
-import dagger.hilt.android.AndroidEntryPoint
 import id.hokben.crewdevice.databinding.ActivityMainBinding
-import id.hokben.crewdevice.repository.MainRepository
-import id.hokben.crewdevice.service.WebrtcService.Companion.screenPermissionIntent
-import id.hokben.crewdevice.service.WebrtcServiceRepository
-import id.hokben.crewdevice.webrtc.SimpleSdpObserver
 import io.socket.client.IO
 import io.socket.client.Socket
-import io.socket.emitter.Emitter
 import org.json.JSONException
 import org.json.JSONObject
 import org.webrtc.AudioSource
@@ -47,11 +37,9 @@ import org.webrtc.VideoTrack
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 import java.net.URISyntaxException
-import javax.inject.Inject
 
 
-@AndroidEntryPoint
-class MainActivity : AppCompatActivity(), MainRepository.Listener {
+class MainActivity : AppCompatActivity() {
     private var socket: Socket? = null
     private var isInitiator = false
     private var isChannelReady = false
@@ -59,17 +47,11 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
 
     private val localStreamId = "ARDAMS"
 
-    @Inject
-    lateinit var webrtcServiceRepository: WebrtcServiceRepository
 
-    var audioConstraints: MediaConstraints? = null
-    var videoConstraints: MediaConstraints? = null
-    var sdpConstraints: MediaConstraints? = null
-    var videoSource: VideoSource? = null
-    var localVideoTrack: VideoTrack? = null
-    var audioSource: AudioSource? = null
-    var localAudioTrack: AudioTrack? = null
-    var surfaceTextureHelper: SurfaceTextureHelper? = null
+    private var audioConstraints: MediaConstraints? = null
+    private var videoSource: VideoSource? = null
+    private var audioSource: AudioSource? = null
+    private var localAudioTrack: AudioTrack? = null
 
     private lateinit var binding: ActivityMainBinding
     private var peerConnection: PeerConnection? = null
@@ -131,16 +113,6 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
 
 
 
-    @SuppressLint("NewApi")
-    private fun initShareScreen() {
-        Log.e("NotError", "MainActivity@initShareScreen")
-
-//        surfaceView = binding.surfaceViewShareScreen
-//        listener = this
-//        webrtcServiceRepository.startIntent(Utils.getUsername(contentResolver))
-//        startScreenCapture()
-    }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -180,36 +152,34 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
 
     private fun connectToSignallingServer() {
         try {
-            // For me this was "http://192.168.1.220:3000";
-            // $ hostname -I
-            val URL =
-                BuildConfig.SIGNALING_SERVER_URL // "https://calm-badlands-59575.herokuapp.com/"; //
-            Log.e(TAG, "REPLACE ME: IO Socket:$URL")
-            socket = IO.socket(URL)
+            val url =
+                BuildConfig.SIGNALING_SERVER_URL
+            Log.e(TAG, "REPLACE ME: IO Socket:$url")
+            socket = IO.socket(url)
 
-            socket?.on(Socket.EVENT_CONNECT, Emitter.Listener { args: Array<Any?>? ->
+            socket?.on(Socket.EVENT_CONNECT) {
                 Log.d(TAG, "connectToSignallingServer: connect")
                 socket?.emit("create or join", "cuarto")
-            })?.on("ipaddr") { args: Array<Any?>? ->
+            }?.on("ipaddr") {
                 Log.d(TAG, "connectToSignallingServer: ipaddr")
-            }?.on("created") { args: Array<Any?>? ->
+            }?.on("created") {
                 Log.d(TAG, "connectToSignallingServer: created")
                 isInitiator = true
-            }?.on("full") { args: Array<Any?>? ->
+            }?.on("full") {
                 Log.d(TAG, "connectToSignallingServer: full")
-            }?.on("join") { args: Array<Any?>? ->
+            }?.on("join") {
                 Log.d(TAG, "connectToSignallingServer: join")
                 Log.d(TAG, "connectToSignallingServer: Another peer made a request to join room")
                 Log.d(TAG, "connectToSignallingServer: This peer is the initiator of room")
                 isChannelReady = true
-            }?.on("joined") { args: Array<Any?>? ->
+            }?.on("joined") {
                 Log.d(TAG, "connectToSignallingServer: joined")
                 isChannelReady = true
             }?.on("log") { args: Array<Any> ->
                 for (arg in args) {
                     Log.d(TAG, "connectToSignallingServer: $arg")
                 }
-            }?.on("message") { args: Array<Any?>? ->
+            }?.on("message") {
                 Log.d(TAG, "connectToSignallingServer: got a message")
             }?.on("message") { args: Array<Any> ->
                 try {
@@ -261,7 +231,7 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
                 } catch (e: JSONException) {
                     e.printStackTrace()
                 }
-            }?.on(Socket.EVENT_DISCONNECT) { args: Array<Any?>? ->
+            }?.on(Socket.EVENT_DISCONNECT) {
                 Log.d(TAG, "connectToSignallingServer: disconnect")
             }
             socket?.connect()
@@ -355,14 +325,14 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
 
         videoCapturer!!.startCapture(VIDEO_RESOLUTION_WIDTH, VIDEO_RESOLUTION_HEIGHT, FPS)
 
-        videoTrackFromCamera = peerConnectionFactory!!.createVideoTrack(VIDEO_TRACK_ID, videoSource)
+        videoTrackFromCamera = peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, videoSource)
         videoTrackFromCamera?.setEnabled(true)
 
         //        videoTrackFromCamera.addRenderer(new VideoRenderer(binding.surfaceView));
 
         //create an AudioSource instance
-        audioSource = peerConnectionFactory!!.createAudioSource(audioConstraints)
-        localAudioTrack = peerConnectionFactory!!.createAudioTrack("101", audioSource)
+        audioSource = peerConnectionFactory.createAudioSource(audioConstraints)
+        localAudioTrack = peerConnectionFactory.createAudioTrack("101", audioSource)
 
 
     }
@@ -375,38 +345,12 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
      * The One who send the video stream
      */
     private fun startStreamingVideo() {
-        val mediaStream = peerConnectionFactory!!.createLocalMediaStream(localStreamId)
+        val mediaStream = peerConnectionFactory.createLocalMediaStream(localStreamId)
         mediaStream.addTrack(videoTrackFromCamera)
         mediaStream.addTrack(localAudioTrack)
         peerConnection!!.addStream(mediaStream)
         Log.e("NotError", "MainActivity@startStreamingVideo")
         sendMessage("got user media")
-    }
-
-    private fun startScreenCapture() {
-        Log.e("NotError", "MainActivity@startScreenCapture")
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return
-        val mediaProjectionManager =
-            getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-
-        startActivityForResult(
-            mediaProjectionManager.createScreenCaptureIntent(), capturePermissionRequestCode
-        )
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        Log.e("NotError", "MainActivity@onActivityResult")
-        if (requestCode != capturePermissionRequestCode) {
-            return
-        }
-
-        screenPermissionIntent = data
-//        webrtcServiceRepository!!.requestConnection(
-//            Utils.getUsername(
-//                contentResolver, true
-//            )
-//        )
     }
 
     private fun createPeerConnectionFactory(): PeerConnectionFactory {
@@ -500,74 +444,6 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
         return peerConnectionFactory.createPeerConnection(
             iceServers, pcObserver
         )
-//        val iceServers = ArrayList<PeerConnection.IceServer>()
-//        val URL = "stun:stun.l.google.com:19302"
-//        iceServers.add(PeerConnection.IceServer(URL))
-//
-//        val rtcConfig = RTCConfiguration(iceServers)
-//        val pcConstraints = MediaConstraints()
-//
-//        val pcObserver: PeerConnection.Observer = object : PeerConnection.Observer {
-//            override fun onSignalingChange(signalingState: PeerConnection.SignalingState) {
-//                Log.d(TAG, "onSignalingChange: ")
-//            }
-//
-//            override fun onIceConnectionChange(iceConnectionState: IceConnectionState) {
-//                Log.d(TAG, "onIceConnectionChange: ")
-//            }
-//
-//            override fun onIceConnectionReceivingChange(b: Boolean) {
-//                Log.d(TAG, "onIceConnectionReceivingChange: ")
-//            }
-//
-//            override fun onIceGatheringChange(iceGatheringState: IceGatheringState) {
-//                Log.d(TAG, "onIceGatheringChange: ")
-//            }
-//
-//            override fun onIceCandidate(iceCandidate: IceCandidate) {
-//                Log.d(TAG, "onIceCandidate: ")
-//                val message = JSONObject()
-//
-//                try {
-//                    message.put("type", "candidate")
-//                    message.put("label", iceCandidate.sdpMLineIndex)
-//                    message.put("id", iceCandidate.sdpMid)
-//                    message.put("candidate", iceCandidate.sdp)
-//
-//                    Log.d(TAG, "onIceCandidate: sending candidate $message")
-//                    sendMessage(message)
-//                } catch (e: JSONException) {
-//                    e.printStackTrace()
-//                }
-//            }
-//
-//            override fun onIceCandidatesRemoved(iceCandidates: Array<IceCandidate>) {
-//                Log.d(TAG, "onIceCandidatesRemoved: ")
-//            }
-//
-//            override fun onAddStream(mediaStream: MediaStream) {
-//                Log.d(TAG, "onAddStream: " + mediaStream.videoTracks.size)
-//                val remoteVideoTrack = mediaStream.videoTracks[0]
-//                val remoteAudioTrack = mediaStream.audioTracks[0]
-//                remoteAudioTrack.setEnabled(true)
-//                remoteVideoTrack.setEnabled(true)
-//                remoteVideoTrack.addRenderer(VideoRenderer(binding!!.surfaceShareCamera))
-//            }
-//
-//            override fun onRemoveStream(mediaStream: MediaStream) {
-//                Log.d(TAG, "onRemoveStream: ")
-//            }
-//
-//            override fun onDataChannel(dataChannel: DataChannel) {
-//                Log.d(TAG, "onDataChannel: ")
-//            }
-//
-//            override fun onRenegotiationNeeded() {
-//                Log.d(TAG, "onRenegotiationNeeded: ")
-//            }
-//        }
-//
-//        return factory!!.createPeerConnection(rtcConfig, pcConstraints, pcObserver)
     }
 
     private fun createVideoCapturer(): VideoCapturer? {
@@ -609,24 +485,6 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
         return Camera2Enumerator.isSupported(this)
     }
 
-    override fun onRemoteStreamAdded(stream: org.webrtc.MediaStream) {
-        runOnUiThread {
-//            stream.videoTracks[0].addSink(
-//                binding.surfaceViewShareScreen
-//            )
-        }
-    }
-
-    override fun onCallEndReceived() {
-    }
-
-    override fun onConnectionConnected() {
-    }
-
-    override fun onConnectionRequestReceived(target: String) {
-//        webrtcServiceRepository!!.acceptCAll(target)
-    }
-
     companion object {
         private const val TAG = "MainActivity"
         private const val RC_CALL = 111
@@ -635,6 +493,5 @@ class MainActivity : AppCompatActivity(), MainRepository.Listener {
         const val VIDEO_RESOLUTION_HEIGHT: Int = 720
         const val FPS: Int = 30
 
-        private const val capturePermissionRequestCode = 1
     }
 }
