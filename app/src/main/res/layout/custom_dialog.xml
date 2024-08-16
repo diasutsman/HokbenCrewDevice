@@ -18,7 +18,12 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_ip"
                 android:hint="Ip local signaling server"
-                android:layout_width="250dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_port"
+                android:hint="Port local signaling server"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
            <LinearLayout
                android:layout_width="match_parent"

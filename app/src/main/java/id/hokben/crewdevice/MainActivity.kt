@@ -68,11 +68,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        CustomDialogClass(this).show()
-        startVideoCapture()
+        CustomDialogClass(this) {
+            startVideoCapture()
 //        initShareScreen()
-        initFragments()
-        initViewpager()
+            initFragments()
+            initViewpager()
+        }.show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -154,7 +155,10 @@ class MainActivity : AppCompatActivity() {
         val perms = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
         if (EasyPermissions.hasPermissions(this, *perms)) {
             val sharedPref = getPreferences(Context.MODE_PRIVATE)
-            connectToSignallingServer(sharedPref.getString(getString(R.string.local_ip_key), ""))
+            connectToSignallingServer(
+                sharedPref.getString(getString(R.string.local_ip_key), ""),
+                sharedPref.getString(getString(R.string.local_port_key), "3030"),
+            )
 
             initializeSurfaceViews()
 
@@ -170,9 +174,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun connectToSignallingServer(ip: String? = null) {
+    private fun connectToSignallingServer(ip: String? = null, port: String? = DEFAULT_PORT_VALUE) {
         try {
-            val url = if (ip != null) "http://$ip:3030" else BuildConfig.SIGNALING_SERVER_URL
+            val url = if (ip != null) "http://$ip:$port" else BuildConfig.SIGNALING_SERVER_URL
             Log.e(TAG, "REPLACE ME: IO Socket:$url")
             socket = IO.socket(url)
 
@@ -511,6 +515,6 @@ class MainActivity : AppCompatActivity() {
         const val VIDEO_RESOLUTION_WIDTH: Int = 1280
         const val VIDEO_RESOLUTION_HEIGHT: Int = 720
         const val FPS: Int = 30
-
+        private const val DEFAULT_PORT_VALUE = "3030"
     }
 }
