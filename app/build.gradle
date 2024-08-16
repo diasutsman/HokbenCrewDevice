@@ -95,5 +95,4 @@ dependencies {
     implementation "com.google.dagger:hilt-android:2.51.1"
     kapt "com.google.dagger:hilt-compiler:2.51.1"
     annotationProcessor("com.google.dagger:hilt-android:2.51.1")
-    implementation 'org.java-websocket:Java-WebSocket:1.5.3'
 }
