@@ -1,8 +1,11 @@
 package id.hokben.crewdevice
 
 import android.Manifest
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -65,11 +68,27 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-
+        CustomDialogClass(this).show()
         startVideoCapture()
 //        initShareScreen()
         initFragments()
         initViewpager()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.options, menu);
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.setIpAddress -> {
+                CustomDialogClass(this).show()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun initViewpager() {
@@ -79,7 +98,8 @@ class MainActivity : AppCompatActivity() {
         ) // Replace with your fragment instances
         val adapter = ViewPagerAdapter(fragments, this)
         binding.pager.adapter = adapter
-        binding.pager.offscreenPageLimit = 3 // add this so that the share screen and the camera always shown
+        binding.pager.offscreenPageLimit =
+            3 // add this so that the share screen and the camera always shown
         TabLayoutMediator(binding.tabLayout, binding.pager) { tab, position ->
             // Set tab text or icon here if needed
             when (position) {
@@ -112,7 +132,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -134,7 +153,8 @@ class MainActivity : AppCompatActivity() {
     private fun startVideoCapture() {
         val perms = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
         if (EasyPermissions.hasPermissions(this, *perms)) {
-            connectToSignallingServer()
+            val sharedPref = getPreferences(Context.MODE_PRIVATE)
+            connectToSignallingServer(sharedPref.getString(getString(R.string.local_ip_key), ""))
 
             initializeSurfaceViews()
 
@@ -150,10 +170,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun connectToSignallingServer() {
+    private fun connectToSignallingServer(ip: String? = null) {
         try {
-            val url =
-                BuildConfig.SIGNALING_SERVER_URL
+            val url = if (ip != null) "http://$ip:3030" else BuildConfig.SIGNALING_SERVER_URL
             Log.e(TAG, "REPLACE ME: IO Socket:$url")
             socket = IO.socket(url)
 
